@@ -1,10 +1,10 @@
 # Steps to prepare an oral history folder for ingestion
 
 ## Environments
-Seed_Bank
-LOC_PreRelease
-LOC_Staging
-LOC_Production
+- Seed_Bank
+- LOC_PreRelease
+- LOC_Staging
+- LOC_Production
 
 ## Commands
 - prepare
