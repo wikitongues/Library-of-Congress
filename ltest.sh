@@ -46,7 +46,7 @@ cd raws
   cd Premier\ Project && mkdir Adobe\ Premiere\ Pro\ Audio\ Previews Adobe\ Premiere\ Pro\ Captured\ Audio && touch ${filename}.prproj && cd ..
   cd footage && mkdir audio captions clips converted
     cd audio && touch ${name}.pkf ${name}.wav ${name}.aiff && cd ..
-    # cd captions && touch ${name}.pkf ${name}.wav ${name}.aiff && cd ..
+    cd captions && touch ${name}.srt && cd ..
     cd clips && touch ${name}.MOV ${name}.THM && cd ..
     cd converted && touch ${name}.mov && cd ..
   cd ..

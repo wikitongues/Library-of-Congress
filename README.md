@@ -7,6 +7,7 @@
 - LOC_Production
 
 ## Commands
+- `setup`
 - `ltest`
 - `prepare`
 - `flatten`
@@ -16,6 +17,7 @@
 - `store`
 
 ## Steps
+0. Run `$ setup` from your locally synced Dropbox Oral Histories directory.
 1. Run `$ prepare [directory]` to create a copy of the desired oral history folder from Seed_Bank parent directory to LOC_PreRelease directory.
 2. Run `$ flatten [directory]` to take process the directory into the acceptable LOC structure.
 3. Run `$ clean [directory]` to enter an interactive process to identify which files to keep according to the LOC structure.
