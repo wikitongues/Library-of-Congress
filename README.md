@@ -27,6 +27,6 @@
 6. Run `$ loc-release [directory]` to move directory from LOC_PreRelease to LOC_Staging.
 
 # Notes for Fred
-Once the contents of LOC_Staging have been successfully ingested by the team at LOC, run `$ store` from within `LOC_PreRelease/.` to move all directories from LOC_Staging to LOC_Production.
+Once the contents of LOC_Staging have been successfully ingested by the team at LOC, run `$ loc-store` from within `LOC_PreRelease/.` to move all directories from LOC_Staging to LOC_Production.
 
 `$ loc-test` makes a dummy oral history folder to test scripting with.
