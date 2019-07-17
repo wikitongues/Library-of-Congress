@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# The setup script writes a config file with the address of the following directories: LOC_PreRelease, LOC_Staging, LOC_Production
+# The setup script creates or updates a config file with the address of the following directories: LOC_PreRelease, LOC_Staging, LOC_Production
 
 printf 'Before you set up your system for this, you have to have synced the three LOC folders\n( "/LOC_PreRelease", "/LOC_Staging", "/LOC_Production" ) from Dropbox onto your local machine.\n'
 sleep 1
