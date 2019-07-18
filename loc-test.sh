@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# The ltest script makes a dummy Oral History folder to test scripting with.
+# The loc-test script makes a dummy Oral History folder to test scripting with.
 # Sample Oral History:
 # Edgar_20180728_gwr.jpg
 # Edgar_20180728_gwr.mp4
@@ -34,7 +34,7 @@ name=`whoami`
 l=`date | md5`
 l=${l//[[:digit:]]/}
 language=`echo $l | cut -c1-3`
-filename="${name}_${today}_${language}"
+filename="loctemp__${name}_${today}_${language}"
 mkdir $filename
 cd $filename
 echo "New directory created: ${filename}"
