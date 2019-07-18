@@ -5,6 +5,13 @@
 # filename__kind_type where kind is media and type is one of 'raw', 'edited', or a language code for captions
 remove_readme () {
   echo "$1. Searching for Readme"
+  if [[ -n $(find ./** -name '*eadme*' -type f) ]] ; then
+    echo "...Removing Readme"
+    find ./** -name '*eadme*' -print0 | xargs -0 rm -rf
+    echo "Done."
+  else
+    echo "...Readme not found. Skipping."
+  fi
 }
 
 remove_premier () {
