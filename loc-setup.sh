@@ -9,17 +9,17 @@ case "$response" in
     [yY][eE][sS]|[yY])
         echo ""
         echo "Finding the LOC folders on your local machine. This can take a few minutes."
-
+        printf "# Wikitongues loc-config\n# This file is required to prepare oral histories for ingestion by the Library of Congress.\n" > ~/loc-config
         find ~/ -name 'LOC_*' ! -path '*Library*' -type d -print0 |
             while IFS= read -r -d '' line; do
                 location=$line
                 address=`echo $location | rev | cut -d'/' -f 1 | rev`
                 output="${address}='${location}'"
-                echo $output >> loc-config
+                echo $output >> ~/loc-config
             done
         echo ""
         echo "Created loc-config:"
-        cat loc-config
+        cat ~/loc-config
 
         ;;
     *)

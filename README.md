@@ -18,7 +18,7 @@
 - `loc-store`
 
 ## Steps
-0. Run `$ loc-install` from within this repository to make all scripts executable.
+0. Run `$ ./loc-install.sh` from within this repository to make all scripts executable.
 1. Run `$ loc-setup` from your locally synced Dropbox Oral Histories directory.
 2. Run `$ loc-prepare [directory]` to create a copy of the desired oral history folder from Seed_Bank parent directory to LOC_PreRelease directory.
 3. Run `$ loc-flatten [directory]` to take process the directory into the acceptable LOC structure.
