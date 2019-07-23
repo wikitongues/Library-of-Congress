@@ -34,7 +34,7 @@ name=`whoami`
 l=`date | md5`
 l=${l//[[:digit:]]/}
 language=`echo $l | cut -c1-3`
-filename="loctemp__${name}_${today}_${language}"
+filename="${name}_${today}_${language}"
 mkdir $filename
 cd $filename
 echo "New directory created: ${filename}"
@@ -53,3 +53,4 @@ cd raws
   cd thumbnail && touch thumbnail.png && cd ..
 
 cd ..
+# cd .. && loc-prepare $filename
