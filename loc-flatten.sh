@@ -5,6 +5,7 @@
 # filename__kind_type where kind is media and type is one of 'raw', 'edited', or a language code for captions
 # 1. setup filename
 obj=`pwd | rev | cut -d'/' -f 1 | rev | cut -c 10-`
+abs=`pwd`
 
 # Remover Instructions:
 #   $1: order of operations
@@ -55,11 +56,12 @@ traverser () {
     # Do something
     if [[ `ls -l . | grep '^-' | awk '{print $9}'` ]]; then
       renamer
-      # hoister
+      hoister
     fi
     traverser
     cd ..
     depth=$((depth-1))
+    echo "Changing back to depth $depth"
   done
 }
 
@@ -70,10 +72,10 @@ renamer () {
   for file in `ls -l . | grep '^-' | awk '{print $9}'`; do
     if [[ ! `echo "$file" | grep __` ]]; then
       echo "    File found: $file"
-      processor=`echo "$file" | cut -d'.' -f 1`
+      oldName=`echo "$file" | cut -d'.' -f 1`
       extension=`echo "$file" | cut -d'.' -f 2`
-      newName="${processor}__${subdir}_raw.${extension}"
-      echo "    renaming $file to $newName"
+      newName="${oldName}__${subdir}_raw.${extension}"
+      echo "    Renaming $file to $newName"
       mv "$file" $newName
     else
       echo "    $file has been previously processed. Skipping."
@@ -85,8 +87,8 @@ hoister () {
   # Hoists file out of directory into parent directory
   # echo "Hoisting..."
   for file in `ls -l . | grep '^-' | awk '{print $9}'`; do
-    echo Hoisting $file up from $depth
-    mv $file ../
+    echo "    Hoisting '$file' up from '/$subdir' to '/raws'"
+    mv $file "$abs/temp"
   done
 }
 
