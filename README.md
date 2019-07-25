@@ -7,15 +7,15 @@
 - LOC_Production
 
 ## Commands
-- `loc-install`
-- `loc-setup`
-- `loc-test`
-- `loc-prepare`
-- `loc-flatten`
-- `loc-prune`
-- `loc-bag`
-- `loc-release`
-- `loc-store`
+-[x] `loc-install`
+-[x] `loc-setup`
+-[x] `loc-test`
+-[x] `loc-prepare`
+-[x] `loc-flatten`
+-[ ] `loc-prune`
+-[x] `loc-bag`
+-[ ] `loc-release`
+-[ ] `loc-store`
 
 ## Steps
 0. Run `$ ./loc-install.sh` from within this repository to make all scripts executable.
