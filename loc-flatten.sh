@@ -47,38 +47,47 @@ set_video () {
 
 traverser () {
   # traverses a tree
-  printf "Traverser: "
+  printf "  Traverser: "
   for subdir in `ls -l . | grep '^d' | awk '{print $9}'`; do
-    echo "Child directory found at depth $depth: '$subdir'. Changing to sub-directory '$subdir'"
-    cd "$subdir"
-    depth=$((depth+1))
-    # if no child directory, add __directoryName to files
-    # Do something
-    if [[ `ls -l . | grep '^-' | awk '{print $9}'` ]]; then
-      renamer
-      hoister
+    if [[ ! $subdir == temp ]]; then
+      echo "Child directory '$subdir' found at depth $depth. ⇩  Changing to sub-directory '$subdir'"
+      cd "$subdir"
+      depth=$((depth+1))
+      # if no child directory, add __directoryName to files
+      # Do something
+      if [[ `ls -l . | grep '^-' | awk '{print $9}'` ]]; then
+        renamer
+        hoister
+      fi
+      traverser
+      cd ..
+      depth=$((depth-1))
+      echo "⇧  Changing back to depth $depth."
+    else
+      echo "  Ignoring '/temp'"
     fi
-    traverser
-    cd ..
-    depth=$((depth-1))
-    echo "Changing back to depth $depth"
   done
 }
 
 renamer () {
   # renames a file based on its' directory name
   # FAILS WHEN FILENAME HAS SPACES BECAUSE AWK RETURNS FIRST OF N FIELDS
-  echo "  Renamer:"
+  echo "    Renamer:"
+  # strip whitespaces
+  for f in *; do
+    mv "$f" `echo $f | tr ' ' '_'`;
+  done
+
+  # rename
   for file in `ls -l . | grep '^-' | awk '{print $9}'`; do
     if [[ ! `echo "$file" | grep __` ]]; then
-      echo "    File found: $file"
-      oldName=`echo "$file" | cut -d'.' -f 1`
-      extension=`echo "$file" | cut -d'.' -f 2`
+      oldName=`echo "$file" | rev | cut -d'.' -f 2- | rev`
+      extension=`echo "$file" | rev | cut -d'.' -f 1 | rev`
       newName="${oldName}__${subdir}_raw.${extension}"
-      echo "    Renaming $file to $newName"
-      mv "$file" $newName
+      echo "      File found: $file. Renaming to $newName"
+      mv "$file" "$newName"
     else
-      echo "    $file has been previously processed. Skipping."
+      echo "      $file has been previously processed. Skipping."
     fi
   done
 }
@@ -87,26 +96,29 @@ hoister () {
   # Hoists file out of directory into parent directory
   # echo "Hoisting..."
   for file in `ls -l . | grep '^-' | awk '{print $9}'`; do
-    echo "    Hoisting '$file' up from '/$subdir' to '/raws'"
-    mv $file "$abs/temp"
+    echo "    Hoisting '$file' up from '/$subdir' to '/temp'"
+    mv $file "$abs/temp/$file"
   done
 }
 
 cleaner () {
   # remove empty directory
-  echo "clean"
+  echo "$1. Cleaning up empty directories."
+  find . -type d | tail -r | xargs rmdir 2>/dev/null
+  echo Done.
 }
 
 # rename raws/... to ___raws
 raw_flattener () {
+  mkdir "temp"
   echo "$1. Running Flattener"
   depth=0
   counter=0
-  while [[ $counter -le 1 && `ls -l . | grep '^d' | awk '{print $9}'` ]]; do
+  while [[ $counter -lt 1 && `ls -l . | grep '^d' | awk '{print $9}'` ]]; do
     traverser
     counter=$((counter+1))
   done
-  echo "Back to depth $depth. Done."
+  echo "  Back to depth $depth. Done."
 }
 
 if [[ -f ~/loc-config ]]; then
@@ -122,6 +134,7 @@ if [[ -f ~/loc-config ]]; then
     set_thumbnail "4"
     set_video "5"
     raw_flattener "6"
+    cleaner "7"
   else
     echo "The folder you are in cannot be flattened."
     echo "Please make sure the following conditions are met before trying again:"

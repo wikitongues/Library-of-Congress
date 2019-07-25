@@ -15,7 +15,7 @@ else
     do
       echo Copying ${i} to ${target}
       # cp -R ${i} "$target/loctemp__$i"
-      mv ${i} "$target/loctemp__$i"
+      cp -R ${i} "$target/loctemp__$i"
     done
   else
     echo "Couldn't find loc-config. Please run loc-setup."

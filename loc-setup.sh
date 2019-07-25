@@ -18,6 +18,13 @@ run-setup () {
   cat ~/loc-config
 }
 
+# logfile
+if [[ -f ~/loc-log ]]; then
+  printf "\n\n\n––––––––––––––––––––––––––––\n`date`\n"
+else
+  printf "# Wikitongues loc-log\n#Created at `date`\n# This file is a log of all Library of Congress migration activities using the command line" > ~/loc-log
+fi
+
 if [[ -f ~/loc-config ]]; then
   read -r -p "loc-config found. Do you wish to update it? [y/N] " response
   case "$response" in
