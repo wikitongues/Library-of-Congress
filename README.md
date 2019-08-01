@@ -1,5 +1,10 @@
 # Steps to prepare an oral history folder for ingestion
 
+## Current work:
+Upgrading all the IDv1 Oral Histories to IDv2
+Moving all metadata text files into their respective Oral Histories
+Bag all Oral Histories
+
 ## Environments
 - Seed_Bank
 - LOC_PreRelease
