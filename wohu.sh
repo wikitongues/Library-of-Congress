@@ -3,8 +3,8 @@
 # This script updates all oral histories with IDv1 to IDv2
 
 source ~/loc-config
-target="$OH"
-# target=`pwd`
+# target="$OH"
+target=`pwd`
 
 while read p; do
   d=`echo $p | rev | cut -c 15- | rev`

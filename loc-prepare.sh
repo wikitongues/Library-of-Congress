@@ -8,8 +8,8 @@ if [ -z "$1" ]; then
 else
   if [[ -f ~/loc-config ]]; then
     source ~/loc-config
-    # target=$LOC_PreRelease
-    target=`pwd`
+    target="$LOC_PreRelease"
+    # target=`pwd`
 
     for i in "$@"
     do
