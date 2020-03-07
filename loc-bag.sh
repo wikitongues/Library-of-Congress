@@ -1,4 +1,7 @@
 #!/bin/bash
+# Instructions
+# For batch:
+# for i in `ls`; do /Users/Amicus/Documents/Work/Active/Wikitongues/Git/Library-of-congress/loc-bag.sh $i; done
 
 descriptor () {
   temp=();
@@ -29,17 +32,22 @@ bagitProfileIdentifier=""
 
 # alt: python /usr/local/lib/python3.7/site-packages/bagit.py ...
 
-python3 -m bagit $@ \
---source-organization "$sourceOrganization" \
---organization-address "$organizationAddress" \
---contact-name "$contactName" \
---contact-phone "$contactPhone" \
---contact-email "$contactEmail" \
---external-description "$externalDescription" \
---external-identifier "$externalIdentifier" \
---bag-size "$bagSize" \
---bag-count "$bagCount" \
---internal-sender-identifier "$internalSenderIdentifier" \
---internal-sender-description "$internalSenderDescription" \
-# --bag-group-identifier "$bagGroupIdentifier" \
-# --bagit-profile-identifier "$bagitProfileIdentifier" \
+if [[ `find . | grep DS_Store | xargs ls | wc -l` -eq 0 ]]; then
+  python3 -m bagit $@ \
+  --source-organization "$sourceOrganization" \
+  --organization-address "$organizationAddress" \
+  --contact-name "$contactName" \
+  --contact-phone "$contactPhone" \
+  --contact-email "$contactEmail" \
+  --external-description "$externalDescription" \
+  --external-identifier "$externalIdentifier" \
+  --bag-size "$bagSize" \
+  --bag-count "$bagCount" \
+  --internal-sender-identifier "$internalSenderIdentifier" \
+  --internal-sender-description "$internalSenderDescription" \
+  # --bag-group-identifier "$bagGroupIdentifier" \
+  # --bagit-profile-identifier "$bagitProfileIdentifier" \
+else
+  echo "There are DS_Store files lingering around. For more information, run 'find . | grep DS_Store | xargs ls'"
+  echo "To remove, run 'find . | grep DS_Store | xargs rm'"
+fi

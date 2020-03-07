@@ -41,7 +41,7 @@ set_video () {
     mv $obj.mp4 $thumbnail
   else
     # account for pre-processed files
-    echo "No edited thumbnail detected. Skipping for now..."
+    echo "No edited video detected. Skipping for now..."
   fi
 }
 
