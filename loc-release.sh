@@ -2,7 +2,7 @@
 
 # Get oral history id from directory name
 get_id () {
-  id="$(realpath $1)"
+  id="$(pwd)/$1"
   id="${id##*/}"
   id="${id##loctemp__}"
   echo $id
@@ -53,7 +53,7 @@ else
       target="$LOC_Staging"
 
       # Ensure that directory is in LOC_PreRelease
-      if ! [ $(tr '[:upper:]' '[:lower:]' <<< $(dirname $(realpath $i))) = $(tr '[:upper:]' '[:lower:]' <<< $LOC_PreRelease) ]; then
+      if ! [ $(tr '[:upper:]' '[:lower:]' <<< $(dirname $(pwd)/$i)) = $(tr '[:upper:]' '[:lower:]' <<< $LOC_PreRelease) ]; then
         echo "The given directory was not found in the LOC_PreRelease directory."
         exit 1
       fi

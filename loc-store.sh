@@ -2,7 +2,7 @@
 
 # Get oral history id from directory name
 get_id () {
-  id="$(realpath $1)"
+  id="$(pwd)/$1"
   id="${id##*/}"
   echo $id
 }
@@ -52,7 +52,7 @@ else
       target="$LOC_Production"
 
       # Ensure that directory is in LOC_Staging
-      if ! [ $(tr '[:upper:]' '[:lower:]' <<< $(dirname $(realpath $i))) = $(tr '[:upper:]' '[:lower:]' <<< $LOC_Staging) ]; then
+      if ! [ $(tr '[:upper:]' '[:lower:]' <<< $(dirname $(pwd)/$i)) = $(tr '[:upper:]' '[:lower:]' <<< $LOC_Staging) ]; then
         echo "The given directory was not found in the LOC_Staging directory."
         exit 1
       fi
