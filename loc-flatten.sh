@@ -4,8 +4,6 @@
 
 # filename__kind_type where kind is media and type is one of 'raw', 'edited', or a language code for captions
 # 1. setup filename
-obj=`pwd | rev | cut -d'/' -f 1 | rev | cut -c 10-`
-abs=`pwd`
 
 # Remover Instructions:
 #   $1: order of operations
@@ -125,8 +123,32 @@ if [[ -f ~/loc-config ]]; then
   source ~/loc-config
   target=$LOC_PreRelease
 
-  # directory must have loctemp__ in name and parent directory must be LOC_PreRelease.
-  if pwd | grep -q loctemp__ && pwd | grep -q LOC_PreRelease ; then
+  # Check all directories first
+  for i in "$@"
+  do
+    # directory must have loctemp__ in name
+    if ! [[ $i =~ ^loctemp__.* ]]; then
+      echo "The folder cannot be flattened: $i"
+      echo "Please make sure the following conditions are met before trying again:"
+      echo "1 [ ] You have prepared the oral history you'd like to flatten for pre-release using the loc-prepare command."
+      echo "2 [ ] The oral history you're trying to flatten is in the LOC_PreRelease directory."
+      exit 1
+    fi
+
+    # Ensure that directory is in LOC_PreRelease
+    if ! [ $(tr '[:upper:]' '[:lower:]' <<< $(dirname $(pwd)/$i)) = $(tr '[:upper:]' '[:lower:]' <<< $LOC_PreRelease) ]; then
+      echo "The folder cannot be flattened: $i"
+      echo "The given directory was not found in the LOC_PreRelease directory."
+      exit 1
+    fi
+  done
+
+  for i in "$@"
+  do
+    cd $i
+    obj=`pwd | rev | cut -d'/' -f 1 | rev | cut -c 10-`
+    abs=`pwd`
+
     printf "`pwd | rev | cut -d'/' -f 1 | rev` is valid.\nFlattening...\n"
     remover "1" "Readme" "*eadme*" "f"
     remover "2" "Premier(e) Project" "*remier*" "d"
@@ -135,12 +157,9 @@ if [[ -f ~/loc-config ]]; then
     set_video "5"
     raw_flattener "6"
     cleaner "7"
-  else
-    echo "The folder you are in cannot be flattened."
-    echo "Please make sure the following conditions are met before trying again:"
-    echo "1 [ ] You have prepared the oral history you'd like to flatten for pre-release using the loc-prepare command."
-    echo "2 [ ] The oral history you're trying to flatten is in the LOC_PreRelease directory."
-  fi
+    
+    cd ..
+  done
 
 else
   echo "Couldn't find loc-config. Please run loc-setup."
