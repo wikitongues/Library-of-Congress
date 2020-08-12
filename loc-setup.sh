@@ -6,6 +6,7 @@
 run-setup () {
   echo "Finding the LOC folders on your local machine. This can take a few minutes."
   printf "# Wikitongues loc-config\n# This file is required to prepare oral histories for ingestion by the Library of Congress.\n" > ~/loc-config
+  echo ""
   find ~/ -name 'LOC_*' ! -path '*Library*' -type d -print0 |
       while IFS= read -r -d '' line; do
           location=$line
@@ -22,7 +23,7 @@ run-setup () {
 if [[ -f ~/loc-log ]]; then
   printf "\n\n\n––––––––––––––––––––––––––––\n`date`\n"
 else
-  printf "# Wikitongues loc-log\n#Created at `date`\n# This file is a log of all Library of Congress migration activities using the command line" > ~/loc-log
+  printf "# Wikitongues loc-log\n# Created at `date`\n# This file is a log of all Library of Congress migration activities using the command line" > ~/loc-log
 fi
 
 if [[ -f ~/loc-config ]]; then

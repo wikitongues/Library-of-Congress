@@ -15,6 +15,11 @@ else
   do
     id=$(get_id $i)
 
+    if ! [ -d $@ ]; then
+      echo "Couldn't find desired directory: $@"
+      exit 1
+    fi
+    # if ! [ -d id]
     # Check for data folder
     dataDir="$i/data"
     if ! [ -d $dataDir ]; then
@@ -39,7 +44,7 @@ else
       exit 1
     fi
 
-    # # Check for metadata mp4 file
+    # # Check for metadata file
     # metadata="$i/data/${id}__metadata.mp4"
     # if ! [ -f $metadata ]; then
     #   echo "Couldn't find metadata: $metadata"
@@ -63,11 +68,18 @@ else
   done
 
   # Copy the files
-  for i in "$@"
-  do
+  for i in "$@"; do
     id=$(get_id $i)
 
-    echo Copying ${id} to ${target}
+    echo "Copying ${id} to ${target}."
     cp -R ${i} "$target/$id"
+    printf "Done. \nValidating Bagit Hashes.\n\n"
+    python3 -m bagit --validate "$target/$id"
+    mv ${i} STAGED_${i}
   done
 fi
+
+# ../loc-release.sh loctemp__Amicus_20200811_fdc
+# Couldn't find data directory: loctemp__Amicus_20200811_fdc/data
+# Please run loc-bag.
+# real error: no such directory

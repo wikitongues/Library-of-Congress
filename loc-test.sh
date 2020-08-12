@@ -35,11 +35,11 @@ l=`date | md5`
 l=${l//[[:digit:]]/}
 language=`echo $l | cut -c1-3`
 filename="${name}_${today}_${language}"
-mkdir $filename
-cd $filename
+mkdir ${filename}
+cd ${filename}
 echo "New directory created: ${filename}"
 printf "Location: " && pwd
-touch $filename.jpg $filename.mp4 readme.txt
+touch ${filename}.jpg ${filename}.mp4 readme.txt
 mkdir raws
 cd raws
   mkdir Premier\ Project footage thumbnail
@@ -54,3 +54,4 @@ cd raws
 
 cd ..
 # cd .. && loc-prepare $filename
+echo "Next, run loc-prepare ${filename} to create a copy of the desired oral history folder from Seed_Bank parent directory to LOC_PreRelease directory."
