@@ -19,8 +19,8 @@ Bag all Oral Histories
 - [x] `loc-flatten`
 - [ ] `loc-prune`
 - [x] `loc-bag`
-- [ ] `loc-release`
-- [ ] `loc-store`
+- [x] `loc-release`
+- [x] `loc-store`
 
 ## Steps
 0. Run `$ ./loc-install.sh` from within this repository to make all scripts executable.
