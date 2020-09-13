@@ -67,7 +67,7 @@ else
 
       loc-bag "loctemp__$i" >> ~/loc-log 2>&1
 
-      loc-release "loctemp__$i" >> ~/loc-log
+      loc-release "loctemp__$i" >> ~/loc-log 2>&1
       
     done
 
