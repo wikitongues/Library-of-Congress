@@ -29,7 +29,8 @@ try {
       });
       fetchNextPage();
     } else {
-      console.log(`\x1b[31mWarning! ID '${single}' not found on airtable.`)
+      console.log(`\x1b[31mWarning! ID '${single}' not found on airtable.`);
+      return process.exit(1);
     }
   }, function done(err) {
       if (err) { 
