@@ -1,0 +1,27 @@
+{
+  "name": "loc-metadata-retriever",
+  "version": "1.0.0",
+  "description": "Wikitongues Library of Congress",
+  "main": "loc.sh",
+  "bin": {
+    "loc-metadata-retriever": "getAirtableMetadata.js"
+  },
+  "preferGlobal": true,
+  "dependencies": {
+    "airtable": "^0.7.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wikitongues/Library-of-Congress"
+  },
+  "author": "Kamille Johnson, Freddie Andrade, Scott Rohrer, Airtable",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wikitongues/Library-of-Congress/issues"
+  },
+  "homepage": "https://github.com/wikitongues/Library-of-Congress"
+}

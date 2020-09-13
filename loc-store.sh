@@ -38,13 +38,13 @@ else
       exit 1
     fi
 
-    # # Check for metadata mp4 file
-    # metadata="$i/data/${id}__metadata.mp4"
-    # if ! [ -f $metadata ]; then
-    #   echo "Couldn't find metadata: $metadata"
-    #   echo "Please inspect the directory and make sure all previous steps were run."
-    #   exit 1
-    # fi
+    # Check for metadata txt file
+    metadata="$i/data/${id}__metadata.txt"
+    if ! [ -f $metadata ]; then
+      echo "Couldn't find metadata: $metadata"
+      echo "Please inspect the directory and make sure all previous steps were run."
+      exit 1
+    fi
 
     # Check for config file
     if [[ -f ~/loc-config ]]; then
