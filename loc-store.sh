@@ -66,7 +66,7 @@ else
   do
     id=$(get_id $i)
 
-    echo Copying ${id} to ${target}
-    cp -R ${i} "$target/$id"
+    echo Moving ${id} to ${target}
+    mv ${i} "$target/$id"
   done
 fi
