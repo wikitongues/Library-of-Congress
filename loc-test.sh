@@ -29,12 +29,20 @@
 #   thumbnail/
 #       Screen Shot 2018-09-17 at 8.22.30 PM.png
 
-today=`date +"%Y%m%d"`
-name=`whoami`
-l=`date | md5`
-l=${l//[[:digit:]]/}
-language=`echo $l | cut -c1-3`
-filename="${name}_${today}_${language}"
+if [[ ! -z "$1" ]]; then
+  # Use the supplied oral history ID
+  name="${1%%_*}"
+  filename=$1
+else
+  # Mock up an oral history ID
+  today=`date +"%Y%m%d"`
+  name=`whoami`
+  l=`date | md5`
+  l=${l//[[:digit:]]/}
+  language=`echo $l | cut -c1-3`
+  filename="${name}_${today}_${language}"
+fi
+
 mkdir ${filename}
 cd ${filename}
 echo "New directory created: ${filename}"

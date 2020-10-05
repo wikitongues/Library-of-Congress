@@ -22,6 +22,43 @@ Bag all Oral Histories
 - [x] `loc-release`
 - [x] `loc-store`
 
+## Setup
+Install node dependencies:
+```
+npm install
+```
+Create config file:
+```
+printf "# Wikitongues loc-config\n# This file is required to prepare oral histories for ingestion by the Library of Congress.\nOH=''\nLOC_PreRelease=''\nLOC_Staging=''\nLOC_Production='' > ~/loc-config
+```
+Add Airtable api key and base key to config file (find them here: https://airtable.com/api)
+```
+LOC_APIKEY=<Your API Key>
+LOC_BASE=<Your Base Key>
+```
+Install [bagit](https://github.com/LibraryOfCongress/bagit-python):
+```
+pip install bagit
+```
+Make the scripts executable: run `./loc-install.sh`
+
+### For local testing:
+Add to ~/loc-config:
+```
+LOC_Mode='dev'
+```
+
+## Run
+To run for one or more specific directory:
+```
+loc directory1 directory2 ...
+```
+
+To run for all directories:
+```
+loc *
+```
+
 ## Steps
 0. Run `$ ./loc-install.sh` from within this repository to make all scripts executable.
 1. Run `$ loc-setup` from your *locally synced* Dropbox Oral Histories directory.
