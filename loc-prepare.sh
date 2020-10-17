@@ -15,8 +15,9 @@ else
     do
       echo Copying ${i} to PreRelease: ${target}
 
-      # cp -R ${i} "$target/loctemp__$i"
       cp -R ${i} "${target}/loctemp__$i"
+      dot_clean "${target}/loctemp__$i"
+      
       echo ${i} is now loctemp__${i}
       echo "Done. Next, from within ./LOC_PreRelease, run loc-flatten loctemp__${i} to process the directory into the acceptable LOC structure."
     done
