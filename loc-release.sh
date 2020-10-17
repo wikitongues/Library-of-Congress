@@ -13,6 +13,13 @@ if [ -z "$1" ]; then
 else
   for i in "$@"
   do
+    # Check directory name
+    if ! [[ $i =~ ^loctemp__[a-zA-Z]+ ]]; then
+      echo "Directory name is not the expected format."
+      echo "Please inspect the directory and make sure all previous steps were run."
+      exit 1
+    fi
+
     id=$(get_id $i)
 
     if ! [ -d $@ ]; then
@@ -70,6 +77,11 @@ else
   # Copy the files
   for i in "$@"; do
     id=$(get_id $i)
+
+    if [ -d "$target/$id" ]; then
+      echo "$id is already staged. Skipping."
+      continue
+    fi
 
     echo "Copying ${id} to ${target}."
     cp -R ${i} "$target/$id"
