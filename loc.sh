@@ -121,11 +121,24 @@ do
     fi
   fi
 
+  if ! [[ -f "loctemp__$i/$i.mp4" ]]; then
+    echo "Skipping $i: Not edited"
+    continue
+  fi
+
+  if ! [[ -f "loctemp__$i/$i.jpg" ]]; then
+    echo "Skipping $i: Thumbnail not found"
+    continue
+  fi
+
   echo "Processing $i"
 
   loc-flatten "loctemp__$i" >> ~/loc-log
 
   find . | grep DS_Store | xargs rm
+
+  # Remove files other than edited video, thumbnail, and metadata
+  rm -r "loctemp__$i/temp"
 
   loc-bag "loctemp__$i" >> ~/loc-log 2>&1
 
