@@ -59,6 +59,12 @@ To run for all directories:
 loc *
 ```
 
+To run for a specific year or month:
+```
+loc -y 2020
+loc -y 2020 -m 10
+```
+
 ## Steps
 0. Run `$ ./loc-install.sh` from within this repository to make all scripts executable.
 1. Run `$ loc-setup` from your *locally synced* Dropbox Oral Histories directory.
