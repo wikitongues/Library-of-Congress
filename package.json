@@ -7,10 +7,6 @@
     "loc-metadata-retriever": "getAirtableMetadata.js"
   },
   "preferGlobal": true,
-  "dependencies": {
-    "airtable": "^0.7.0"
-  },
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -23,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/wikitongues/Library-of-Congress/issues"
   },
-  "homepage": "https://github.com/wikitongues/Library-of-Congress"
+  "homepage": "https://github.com/wikitongues/Library-of-Congress",
+  "dependencies": {
+    "airtable": "^0.10.0"
+  }
 }
