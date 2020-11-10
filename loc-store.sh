@@ -66,6 +66,11 @@ else
   do
     id=$(get_id $i)
 
+    if [ -d "$target/$id" ]; then
+      echo "$id is already released. Skipping."
+      continue
+    fi
+
     echo Moving ${id} to ${target}
     mv ${i} "$target/$id"
   done

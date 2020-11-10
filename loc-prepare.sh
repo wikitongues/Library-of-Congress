@@ -9,14 +9,15 @@ else
   if [[ -f ~/loc-config ]]; then
     source ~/loc-config
     target="${LOC_PreRelease}"
-    # target=`pwd`
 
     for i in "$@"
     do
       echo Copying ${i} to PreRelease: ${target}
 
-      # cp -R ${i} "$target/loctemp__$i"
-      cp -R ${i} "${target}/loctemp__$i"
+      # Copies directory to PreRelease, deleting any existing directory with the same id
+      rsync -a --delete "${i}/" "${target}/loctemp__$i/"
+      dot_clean "${target}/loctemp__$i"
+      
       echo ${i} is now loctemp__${i}
       echo "Done. Next, from within ./LOC_PreRelease, run loc-flatten loctemp__${i} to process the directory into the acceptable LOC structure."
     done
