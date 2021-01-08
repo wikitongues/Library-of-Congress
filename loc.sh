@@ -11,6 +11,20 @@ get_distribution () {
   done < "./loctemp__${i}/${i}__metadata.txt"
 }
 
+# Rename directory to S3-compliant identifier
+get_compliant_identifier () {
+  # Convert to ascii characters
+  identifier=$(echo $1 | iconv -f UTF-8 -t ascii//TRANSLIT//ignore)
+
+  # Remove characters left by Mac iconv implementation
+  identifier=${identifier//[\'\^\~\"]/''}
+
+  # Change + to -
+  identifier=${identifier//\+/'-'}
+
+  echo $identifier
+}
+
 if [ -z "$1" ]; then
   printf "Usage: $ loc <directory name>\nPlease make sure you reference a desired oral history directory to prepare.\n"
   exit 1
@@ -133,16 +147,26 @@ do
 
   echo "Processing $i"
 
-  loc-flatten "loctemp__$i" >> ~/loc-log
+  identifier=$(get_compliant_identifier $i)
+  if [ $identifier != $i ]; then
+    echo $identifier
+
+    mv "loctemp__$i/$i.mp4" "loctemp__$i/$identifier.mp4"
+    mv "loctemp__$i/$i.jpg" "loctemp__$i/$identifier.jpg"
+    mv "loctemp__$i/${i}__metadata.txt" "loctemp__$i/${identifier}__metadata.txt"
+    mv "loctemp__$i" "loctemp__$identifier"
+  fi
+
+  loc-flatten "loctemp__$identifier" >> ~/loc-log
 
   find . | grep DS_Store | xargs rm
 
   # Remove files other than edited video, thumbnail, and metadata
-  rm -r "loctemp__$i/temp"
+  rm -r "loctemp__$identifier/temp"
 
-  loc-bag "loctemp__$i" >> ~/loc-log 2>&1
+  loc-bag "loctemp__$identifier" >> ~/loc-log 2>&1
 
-  loc-release "loctemp__$i" >> ~/loc-log 2>&1
+  loc-release "loctemp__$identifier" >> ~/loc-log 2>&1
   
 done
 
