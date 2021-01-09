@@ -30,15 +30,22 @@ if [ -z "$1" ]; then
   exit 1
 fi
 
-if ! [[ -f ~/loc-config ]]; then
-  echo "Couldn't find loc-config. Please run loc-setup."
-  exit 1
-fi
-
 directories=()
 
 month=''
 year=''
+dev=false
+
+args=()
+while (( $# )); do
+  case $1 in
+    -d) dev=true ;;
+    *)  args+=("$1") ;;
+  esac
+  shift
+done
+set -- "${args[@]}"
+
 while getopts 'm:y:' flag; do
   case "${flag}" in
     m) month="${OPTARG}" ;;
@@ -89,7 +96,19 @@ if ! [[ $confirmation =~ ^([yY][eE][sS])|[yY]$ ]]; then
   exit 0
 fi
 
-source ~/loc-config
+loc_options=()
+loc_config=~/loc-config
+if [[ $dev == true ]]; then
+  loc_config=~/loc-config-dev
+  loc_options+=('-d')
+fi
+
+if ! [[ -f "$loc_config" ]]; then
+  echo "Couldn't find $loc_config. Please run loc-setup."
+  exit 1
+fi
+
+source $loc_config
 
 if [[ $LOC_Mode = "dev" ]]; then
   echo "Running in dev mode. Will not check metadata."
@@ -102,7 +121,7 @@ fi
 for i in $directories
 do
   echo "Preparing $i"
-  loc-prepare $i >> ~/loc-log
+  loc-prepare "${loc_options[@]}" $i >> ~/loc-log
 done
 
 cd $LOC_PreRelease
@@ -115,7 +134,7 @@ if [[ ! $LOC_Mode = "dev" ]]; then
     metadata_status=$?
     if [[ $metadata_status -eq 1 ]]; then
       echo "Encountered error updating metadata for $i. Check ~/loc-log."
-      echo "If you are using local directories for testing, set LOC_Mode='dev' in ~/loc-config."
+      echo "If you are using local directories for testing, set LOC_Mode='dev' in $loc_config."
       exit 1
     fi
   done
@@ -149,15 +168,13 @@ do
 
   identifier=$(get_compliant_identifier $i)
   if [ $identifier != $i ]; then
-    echo $identifier
-
     mv "loctemp__$i/$i.mp4" "loctemp__$i/$identifier.mp4"
     mv "loctemp__$i/$i.jpg" "loctemp__$i/$identifier.jpg"
     mv "loctemp__$i/${i}__metadata.txt" "loctemp__$i/${identifier}__metadata.txt"
     mv "loctemp__$i" "loctemp__$identifier"
   fi
 
-  loc-flatten "loctemp__$identifier" >> ~/loc-log
+  loc-flatten "${loc_options[@]}" "loctemp__$identifier" >> ~/loc-log
 
   find . | grep DS_Store | xargs rm
 
@@ -166,7 +183,7 @@ do
 
   loc-bag "loctemp__$identifier" >> ~/loc-log 2>&1
 
-  loc-release "loctemp__$identifier" >> ~/loc-log 2>&1
+  loc-release "${loc_options[@]}" "loctemp__$identifier" >> ~/loc-log 2>&1
   
 done
 
