@@ -17,7 +17,7 @@ get_compliant_identifier () {
   identifier=$(echo $1 | iconv -f UTF-8 -t ascii//TRANSLIT//ignore)
 
   # Remove characters left by Mac iconv implementation
-  identifier=${identifier//[\'\^\~\"]/''}
+  identifier=${identifier//[\'\^\~\"\`]/''}
 
   # Change + to -
   identifier=${identifier//\+/'-'}
