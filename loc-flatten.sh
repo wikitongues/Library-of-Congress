@@ -125,10 +125,27 @@ raw_flattener () {
   echo "  Back to depth ${depth}. Done."
 }
 
-source ~/loc-config
+dev=false
+args=()
+while (( $# )); do
+  case $1 in
+    -d) dev=true ;;
+    *)  args+=("$1") ;;
+  esac
+  shift
+done
+set -- "${args[@]}"
+
+loc_config=~/loc-config
+if [[ $dev == true ]]; then
+  loc_config=~/loc-config-dev
+fi
+
+source $loc_config
+
 target=${LOC_PreRelease}
 if [[ `pwd` = ${target} ]]; then
-  if [[ -f ~/loc-config ]]; then
+  if [[ -f $loc_config ]]; then
 
     # Check all directories first
     for i in "$@"

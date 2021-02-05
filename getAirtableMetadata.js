@@ -85,7 +85,7 @@ var fields = [
 try {
   var base = new Airtable({apiKey: process.env.APIKEY}).base(process.env.BASE);
 
-  base('🍩 Oral Histories').select({
+  base('Oral Histories').select({
       view: "Archival View (Comprehensive)",
       cellFormat: "string",
       timeZone: "America/New_York",

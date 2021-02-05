@@ -42,12 +42,6 @@ pip install bagit
 ```
 Make the scripts executable: run `./loc-install.sh`
 
-### For local testing:
-Add to ~/loc-config:
-```
-LOC_Mode='dev'
-```
-
 ## Run
 To run for one or more specific directory:
 ```
@@ -63,6 +57,16 @@ To run for a specific year or month:
 ```
 loc -y 2020
 loc -y 2020 -m 10
+```
+
+### For local testing:
+Copy ~/loc-config to ~/loc-config-dev and change settings as desired for testing. To run in dev mode:
+```
+loc -d ...
+```
+To bypass Airtable lookup, add this line to ~/loc-config-dev:
+```
+LOC_Mode='dev'
 ```
 
 ## Steps
