@@ -34,12 +34,15 @@ directories=()
 
 month=''
 year=''
+file=''
 dev=false
 
 args=()
 while (( $# )); do
   case $1 in
     -d) dev=true ;;
+    -f) shift
+        file=$1 ;;
     *)  args+=("$1") ;;
   esac
   shift
@@ -55,7 +58,22 @@ while getopts 'm:y:' flag; do
   esac
 done
 
-if ! [ -z $year ]; then
+if ! [ -z $file ]; then
+  # File flag provided
+
+  # Check for existence of file
+  if ! [[ -f "$file" ]]; then
+    echo "Couldn't find $file."
+    exit 1
+  fi
+
+  # Read directories from file
+  while IFS= read -r line || [[ "$line" ]]; do
+    # echo $line
+    directories+=("$line")
+  done < $file
+
+elif ! [ -z $year ]; then
   # Year flag provided
   if ! [[ $year =~ ^[0-9]{4}$ ]]; then
     echo "Invalid year $year"
@@ -73,18 +91,19 @@ if ! [ -z $year ]; then
     month='(0[1-9]|1[0-2])'
   fi
 
-  directories=$(ls | egrep -e "[a-zA-Z]+_${year}${month}[0-9]{2}_[a-z]+(\+[a-z]+)*$")
+  # Filter ls output by date
+  directories=($(ls | egrep -e "[a-zA-Z]+_${year}${month}[0-9]{2}_[a-z]+(\+[a-z]+)*$"))
 
 elif ! [ -z $month ]; then
   echo "Must set year, e.g. $ loc -m 10 -y 2020"
   exit 1
 else
-  directories=$@
+  directories=("$@")
 fi
 
 echo "Will process the following directories:"
 n=0
-for i in $directories
+for i in "${directories[@]}"
 do
   echo "* $i"
   n=$((n+1))
@@ -118,7 +137,7 @@ fi
 
 > ~/loc-log
 
-for i in $directories
+for i in "${directories[@]}"
 do
   echo "Preparing $i"
   loc-prepare "${loc_options[@]}" $i >> ~/loc-log
@@ -127,7 +146,7 @@ done
 cd $LOC_PreRelease
 
 if [[ ! $LOC_Mode = "dev" ]]; then
-  for i in $directories
+  for i in "${directories[@]}"
   do
     echo "Updating metadata for $i"
     APIKEY=$LOC_APIKEY BASE=$LOC_BASE loc-metadata-retriever $i ./ ./ >> ~/loc-log 2>&1
@@ -139,13 +158,13 @@ if [[ ! $LOC_Mode = "dev" ]]; then
     fi
   done
 else
-  for i in $directories
+  for i in "${directories[@]}"
   do
     touch "./loctemp__${i}/${i}__metadata.txt"
   done
 fi
 
-for i in $directories
+for i in "${directories[@]}"
 do
   if [[ ! $LOC_Mode = "dev" ]]; then
     if [[ $(get_distribution $i) = "Wikitongues only" ]]; then

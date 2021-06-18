@@ -59,6 +59,11 @@ loc -y 2020
 loc -y 2020 -m 10
 ```
 
+To provide a file containing newline-separated directory names:
+```
+loc -f /path/to/file
+```
+
 ### For local testing:
 Copy ~/loc-config to ~/loc-config-dev and change settings as desired for testing. To run in dev mode:
 ```
