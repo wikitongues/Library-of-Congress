@@ -85,12 +85,14 @@ var fields = [
 try {
   var base = new Airtable({apiKey: process.env.APIKEY}).base(process.env.BASE);
 
+  var identifier = single.replace(/\+/g, '-');
+
   base('Oral Histories').select({
       view: "Archival View (Comprehensive)",
       cellFormat: "string",
       timeZone: "America/New_York",
       userLocale: "en-ca",
-      filterByFormula: "Identifier='"+single+"'",
+      filterByFormula: "Identifier='"+identifier+"'",
       fields
   }).eachPage(function page(records, fetchNextPage) {
     if (!Array.isArray(records) || !!records.length) {
@@ -101,11 +103,11 @@ try {
             ...fields.map(field => `${field}: ${record.get(field)}`)
           ].join('\n');
 
-          fs.writeFileSync(`${destination}/loctemp__${single}/${record.get('Identifier')}__metadata.txt`, content);
+          fs.writeFileSync(`${destination}/loctemp__${single}/${single}__metadata.txt`, content);
       });
       fetchNextPage();
     } else {
-      console.log(`\x1b[31mWarning! ID '${single}' not found on airtable.`);
+      console.log(`\x1b[31mWarning! ID '${identifier}' not found on airtable.`);
       return process.exit(1);
     }
   }, function done(err) {
