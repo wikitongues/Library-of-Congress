@@ -7,6 +7,22 @@ get_id () {
   echo $id
 }
 
+dev=false
+args=()
+while (( $# )); do
+  case $1 in
+    -d) dev=true ;;
+    *)  args+=("$1") ;;
+  esac
+  shift
+done
+set -- "${args[@]}"
+
+loc_config=~/loc-config
+if [[ $dev == true ]]; then
+  loc_config=~/loc-config-dev
+fi
+
 if [ -z "$1" ]; then
   printf "Usage: $ loc-store <directory name>\nPlease make sure you reference a desired oral history directory to move to production.\n"
 else
@@ -47,8 +63,8 @@ else
     fi
 
     # Check for config file
-    if [[ -f ~/loc-config ]]; then
-      source ~/loc-config
+    if [[ -f $loc_config ]]; then
+      source $loc_config
       target="$LOC_Production"
 
       # Ensure that directory is in LOC_Staging
