@@ -2,7 +2,7 @@
 
 get_distribution () {
   while read line; do
-    pat='Coverage: Distribution: (.*)'
+    pat='Coverage [Distribution]: (.*)'
     [[ $line =~ $pat ]]
     if [[ ! -z "${BASH_REMATCH[1]}" ]]; then
       echo "${BASH_REMATCH[1]}"

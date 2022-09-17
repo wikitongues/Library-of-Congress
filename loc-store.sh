@@ -23,15 +23,23 @@ if [[ $dev == true ]]; then
   loc_config=~/loc-config-dev
 fi
 
+# Check for config file
+if [[ -f $loc_config ]]; then
+    source $loc_config
+    target="$LOC_Production"
+else
+    echo "Couldn't find loc-config. Please run loc-setup."
+fi
+
+export LOC_Staging STAGING_DROPBOX DROPBOX_TOKEN
+
 if [ -z "$1" ]; then
   printf "Usage: $ loc-store <directory name>\nPlease make sure you reference a desired oral history directory to move to production.\n"
 else
   for i in "$@"
   do
-    id=$(get_id $i)
-
     # Check for data folder
-    dataDir="$i/data"
+    dataDir="${LOC_Staging}/${i}/data"
     if ! [ -d $dataDir ]; then
       echo "Couldn't find data directory: $dataDir"
       echo "Please run loc-bag."
@@ -39,7 +47,7 @@ else
     fi
 
     # Check for thumbnail jpg file
-    thumbnail="$i/data/${id}__thumbnail_edited.jpg"
+    thumbnail="${dataDir}/${i}__thumbnail_edited.jpg"
     if ! [ -f $thumbnail ]; then
       echo "Couldn't find thumbnail: $thumbnail"
       echo "Please inspect the directory and make sure all previous steps were run."
@@ -47,7 +55,7 @@ else
     fi
 
     # Check for video mp4 file
-    video="$i/data/${id}__video_edited.mp4"
+    video="${dataDir}/${i}__video_edited.mp4"
     if ! [ -f $video ]; then
       echo "Couldn't find video: $video"
       echo "Please inspect the directory and make sure all previous steps were run."
@@ -55,39 +63,28 @@ else
     fi
 
     # Check for metadata txt file
-    metadata="$i/data/${id}__metadata.txt"
+    metadata="${dataDir}/${i}__metadata.txt"
     if ! [ -f $metadata ]; then
       echo "Couldn't find metadata: $metadata"
       echo "Please inspect the directory and make sure all previous steps were run."
       exit 1
-    fi
-
-    # Check for config file
-    if [[ -f $loc_config ]]; then
-      source $loc_config
-      target="$LOC_Production"
-
-      # Ensure that directory is in LOC_Staging
-      if ! [ $(tr '[:upper:]' '[:lower:]' <<< $(dirname $(pwd)/$i)) = $(tr '[:upper:]' '[:lower:]' <<< $LOC_Staging) ]; then
-        echo "The given directory was not found in the LOC_Staging directory."
-        exit 1
-      fi
-    else
-      echo "Couldn't find loc-config. Please run loc-setup."
     fi
   done
 
   # Copy the files
   for i in "$@"
   do
-    id=$(get_id $i)
-
-    if [ -d "$target/$id" ]; then
-      echo "$id is already released. Skipping."
+    if [ -d "${target}/${i}" ]; then
+      echo "${i} is already released. Skipping."
       continue
     fi
 
-    echo Moving ${id} to ${target}
-    mv ${i} "$target/$id"
+    python "${LOC_REPO}/uploadFilesToDropbox.py" "${i}"
+    if [ $? -ne 0 ]; then
+        echo "Error; ${i} not uploaded to Dropbox."
+        continue
+    fi
+    echo Moving ${i} to ${target}
+    mv "${LOC_Staging}/${i}" "${target}/${i}"
   done
 fi

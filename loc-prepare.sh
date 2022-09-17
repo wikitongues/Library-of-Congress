@@ -31,7 +31,7 @@ else
       echo Copying ${i} to PreRelease: ${target}
 
       # Copies directory to PreRelease, deleting any existing directory with the same id
-      rsync -a --delete "${i}/" "${target}/loctemp__$i/"
+      rsync -a --delete "${OH}/${i}/" "${target}/loctemp__$i/"
       dot_clean "${target}/loctemp__$i"
       
       echo ${i} is now loctemp__${i}
