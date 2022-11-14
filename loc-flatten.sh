@@ -35,9 +35,9 @@ set_thumbnail () {
 
 set_video () {
   echo "${1}. Setting Video..."
-  if [[ -f ${obj}.mp4 ]]; then
-    video="${obj}__video_edited.mp4"
-    mv ${obj}.mp4 ${video}
+  if [[ -f ${obj}.${video_extension} ]]; then
+    video="${obj}__video_edited.${video_extension}"
+    mv ${obj}.${video_extension} ${video}
     echo "Video set as: ${video}"
   else
     # account for pre-processed files
@@ -126,10 +126,13 @@ raw_flattener () {
 }
 
 dev=false
+video_extension='mp4'
 args=()
 while (( $# )); do
   case $1 in
     -d) dev=true ;;
+    --video-extension) shift
+      video_extension=$1 ;;
     *)  args+=("$1") ;;
   esac
   shift

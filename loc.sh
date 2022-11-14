@@ -1,14 +1,22 @@
 #!/bin/bash
 
-get_distribution () {
+get_field () {
+  pat="${1}: (.*)"
   while read line; do
-    pat='Coverage [Distribution]: (.*)'
     [[ $line =~ $pat ]]
     if [[ ! -z "${BASH_REMATCH[1]}" ]]; then
       echo "${BASH_REMATCH[1]}"
       break
     fi
-  done < "./loctemp__${i}/${i}__metadata.txt"
+  done < "${LOC_PreRelease}/loctemp__${i}/${i}__metadata.txt"
+}
+
+get_distribution () {
+  get_field 'Coverage \[Distribution\]'
+}
+
+get_editing_status () {
+  get_field 'Editing Status'
 }
 
 # Rename directory to S3-compliant identifier
@@ -166,15 +174,36 @@ fi
 
 for i in "${directories[@]}"
 do
+  # dev mode will not retrieve metadata
   if [[ ! $LOC_Mode = "dev" ]]; then
-    if [[ $(get_distribution $i) = "Wikitongues only" ]]; then
+    if [[ $(get_distribution) = "Wikitongues only" ]]; then
       echo "Skipping $i: Not for external distribution"
+      continue
+    fi
+
+    editing_status=$(get_editing_status)
+    if [[ $editing_status != 'Edited' && $editing_status != 'No need to edit' ]]; then
+      echo "Skipping $i: Not edited"
       continue
     fi
   fi
 
-  if ! [[ -f "loctemp__$i/$i.mp4" ]]; then
-    echo "Skipping $i: Not edited"
+  loctemp_dir="${LOC_PreRelease}/loctemp__${i}"
+
+  declare -a video_extensions=('mp4' 'mov' 'mpg' 'mpeg' 'avi' 'm4v' 'wmv' 'mts' 'mkv')
+  for video_extension in ${video_extensions[@]}; do
+    edited_result=$(find ${loctemp_dir} -type f -ipath "${i}.${video_extension}")
+    raw_result=$(find "${loctemp_dir}/raws/footage/clips" -type f -ipath "*.${video_extension}")
+    if ! [[ -z $edited_result ]]; then
+      break
+    elif [[ $(echo $raw_result | wc -l) -eq 1 ]]; then
+      cp $raw_result "${loctemp_dir}/${i}.${video_extension}"
+      break
+    fi
+  done
+
+  if ! [[ -f "${loctemp_dir}/${i}.${video_extension}" ]]; then
+    echo "Skipping ${i}: No edited video"
     continue
   fi
 
@@ -187,10 +216,10 @@ do
 
   identifier=$(get_compliant_identifier $i)
   if [ $identifier != $i ]; then
-    mv "loctemp__$i/$i.mp4" "loctemp__$i/$identifier.mp4"
-    mv "loctemp__$i/$i.jpg" "loctemp__$i/$identifier.jpg"
-    mv "loctemp__$i/${i}__metadata.txt" "loctemp__$i/${identifier}__metadata.txt"
-    mv "loctemp__$i" "loctemp__$identifier"
+    mv "loctemp__${i}/${i}.${video_extension}" "loctemp__${i}/${identifier}.${video_extension}"
+    mv "loctemp__${i}/${i}.jpg" "loctemp__${i}/${identifier}.jpg"
+    mv "loctemp__${i}/${i}__metadata.txt" "loctemp__${i}/${identifier}__metadata.txt"
+    mv "loctemp__${i}" "loctemp__${identifier}"
   fi
 
   loc-flatten "${loc_options[@]}" "loctemp__$identifier" >> ~/loc-log
@@ -203,7 +232,7 @@ do
   loc-bag "loctemp__$identifier" >> ~/loc-log 2>&1
 
   loc-release "${loc_options[@]}" "loctemp__$identifier" >> ~/loc-log 2>&1
-  
+
 done
 
 echo "Done!"

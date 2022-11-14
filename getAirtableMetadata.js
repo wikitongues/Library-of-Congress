@@ -79,7 +79,8 @@ var fields = [
   'Compression mode',
   'Sampling rate',
   'Stream size audio',
-  'Reference ID [Ethnologue]'
+  'Reference ID [Ethnologue]',
+  'Editing Status'
 ];
 
 try {
@@ -101,7 +102,7 @@ try {
             `Metadata for ${record.get('Identifier')}`,
 
             ...fields.map(field => `${field}: ${record.get(field)}`)
-          ].join('\n');
+          ].join('\n') + '\r\n';
 
           fs.writeFileSync(`${destination}/loctemp__${single}/${single}__metadata.txt`, content);
       });
@@ -111,8 +112,8 @@ try {
       return process.exit(1);
     }
   }, function done(err) {
-      if (err) { 
-        console.error(err); 
+      if (err) {
+        console.error(err);
         return process.exit(1);
       }
   });

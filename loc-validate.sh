@@ -62,7 +62,17 @@ while IFS= read -r line || [[ "$line" ]]; do
     continue
   fi
 
-  if ! [[ -f "${OH_DROPBOX}/${identifier}/${identifier}.mp4" ]]; then
+  if [[ -z $(find "${OH_DROPBOX}/${identifier}" -type f \( \
+    -iname \*.mp4 -o \
+    -iname \*.mov -o \
+    -iname \*.mpg -o \
+    -iname \*.mpeg -o \
+    -iname \*.avi -o \
+    -iname \*.m4v -o \
+    -iname \*.wmv -o \
+    -iname \*.mts -o \
+    -iname \*.mkv \
+  \)) ]]; then
     invalid_video+=($line)
   elif ! [[ -f "${OH_DROPBOX}/${identifier}/${identifier}.jpg" ]]; then
     invalid_thumbnail+=($line)

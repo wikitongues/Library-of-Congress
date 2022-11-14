@@ -8,10 +8,13 @@ get_id () {
 }
 
 dev=false
+video_extension='mp4'
 args=()
 while (( $# )); do
   case $1 in
     -d) dev=true ;;
+    --video-extension) shift
+      video_extension=$1 ;;
     *)  args+=("$1") ;;
   esac
   shift
@@ -54,8 +57,8 @@ else
       exit 1
     fi
 
-    # Check for video mp4 file
-    video="${dataDir}/${i}__video_edited.mp4"
+    # Check for video file
+    video="${dataDir}/${i}__video_edited.${video_extension}"
     if ! [ -f $video ]; then
       echo "Couldn't find video: $video"
       echo "Please inspect the directory and make sure all previous steps were run."
