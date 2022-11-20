@@ -40,7 +40,6 @@ fi
 loc_config=~/loc-config
 if [[ $dev == true ]]; then
   echo "Running dry run in dev mode."
-  loc_config=~/loc-config-dev
 fi
 
 if ! [[ -f "$loc_config" ]]; then
