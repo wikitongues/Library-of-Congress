@@ -100,8 +100,13 @@ loc -f /path/to/file
 ```
 
 ### Upload processed oral histories to Dropbox:
+To run for one or more specific directory:
 ```
-loc-store directory1 directory2 ...
+./loc-store.sh directory1 directory2 ...
+```
+To provide a file containing newline-separated directory names:
+```
+./loc-store.sh -f /path/to/file
 ```
 
 ### For local testing:
