@@ -19,6 +19,10 @@ get_editing_status () {
   get_field 'Editing Status'
 }
 
+get_public_status () {
+  get_field 'Public Status'
+}
+
 # Rename directory to S3-compliant identifier
 get_compliant_identifier () {
   # Convert to ascii characters
@@ -182,15 +186,21 @@ do
     fi
 
     editing_status=$(get_editing_status)
-    if [[ $editing_status != 'Edited' && $editing_status != 'No need to edit' ]]; then
+    if [[ "${editing_status}" != 'Edited' && "${editing_status}" != 'No need to edit' ]]; then
       echo "Skipping $i: Not edited"
+      continue
+    fi
+
+    public_status=$(get_public_status)
+    if [[ "${public_status}" != 'Public' ]]; then
+      echo "Skipping $i: Not public"
       continue
     fi
   fi
 
   loctemp_dir="${LOC_PreRelease}/loctemp__${i}"
 
-  declare -a video_extensions=('mp4' 'mov' 'mpg' 'mpeg' 'avi' 'm4v' 'wmv' 'mts' 'mkv')
+  declare -a video_extensions=('mp4' 'mov' 'mpg' 'mpeg' 'avi' 'm4v' 'wmv' 'mts' 'mkv' 'webm')
   for video_extension in ${video_extensions[@]}; do
     edited_result=$(find ${loctemp_dir} -type f -ipath "${i}.${video_extension}")
     raw_result=$(find "${loctemp_dir}/raws/footage/clips" -type f -ipath "*.${video_extension}")
