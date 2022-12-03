@@ -202,13 +202,21 @@ do
     fi
   done
 
+  edited_thumbnail_result=$(find ${loctemp_dir} -type f -ipath "${i}.jpg")
+  if [[ -z $edited_thumbnail_result ]]; then
+    raw_thumbnail_result=$(find "${loctemp_dir}/raws/thumbnail" -type f -ipath '*.jpg')
+    if [[ $(echo "${raw_thumbnail_result}" | wc -l) -eq 1 ]]; then
+      cp "${raw_thumbnail_result}" "${loctemp_dir}/${i}.jpg"
+    fi
+  fi
+
   if ! [[ -f "${loctemp_dir}/${i}.${video_extension}" ]]; then
     echo "Skipping ${i}: No edited video"
     continue
   fi
 
-  if ! [[ -f "loctemp__$i/$i.jpg" ]]; then
-    echo "Skipping $i: Thumbnail not found"
+  if ! [[ -f "${loctemp_dir}/${i}.jpg" ]]; then
+    echo "Skipping ${i}: Thumbnail not found"
     continue
   fi
 

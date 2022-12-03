@@ -74,7 +74,7 @@ while IFS= read -r line || [[ "$line" ]]; do
     -iname \*.mkv \
   \)) ]]; then
     invalid_video+=($line)
-  elif ! [[ -f "${OH_DROPBOX}/${identifier}/${identifier}.jpg" ]]; then
+  elif [[ -z $(find "${OH_DROPBOX}/${identifier}" -type f -iname \*.jpg) ]]; then
     invalid_thumbnail+=($line)
   else
     valid+=($line)
