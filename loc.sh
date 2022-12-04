@@ -212,11 +212,19 @@ do
     fi
   done
 
+  # Check for edited thumbnail in root
   edited_thumbnail_result=$(find ${loctemp_dir} -type f -ipath "${i}.jpg")
   if [[ -z $edited_thumbnail_result ]]; then
-    raw_thumbnail_result=$(find "${loctemp_dir}/raws/thumbnail" -type f -ipath '*.jpg')
-    if [[ $(echo "${raw_thumbnail_result}" | wc -l) -eq 1 ]]; then
-      cp "${raw_thumbnail_result}" "${loctemp_dir}/${i}.jpg"
+    # Check for any jpg file in root (e.g. legacy id or misspelled) and rename
+    legacy_id_thumbnail_result=$(find ${loctemp_dir} -type f -ipath '*.jpg')
+    if [[ $(echo "${legacy_id_thumbnail_result}" | wc -l) -eq 1 ]]; then
+      mv "${legacy_id_thumbnail_result}" "${loctemp_dir}/${i}.jpg"
+    else
+      # Check for jpg in raws and copy to root
+      raw_thumbnail_result=$(find "${loctemp_dir}/raws/thumbnail" -type f -ipath '*.jpg')
+      if [[ $(echo "${raw_thumbnail_result}" | wc -l) -eq 1 ]]; then
+        cp "${raw_thumbnail_result}" "${loctemp_dir}/${i}.jpg"
+      fi
     fi
   fi
 
