@@ -107,7 +107,7 @@ hoister () {
 cleaner () {
   # remove empty directory
   echo "${1}. Cleaning up empty directories."
-  find . -type d | tail -r | xargs rmdir 2>/dev/null
+  find "${LOC_PreRelease}/${i}" -type d | tail -r | xargs rmdir 2>/dev/null
 }
 
 # rename raws/... to ___raws

@@ -43,7 +43,18 @@ bagitProfileIdentifier=""
 
 # alt: python /usr/local/lib/python3.7/site-packages/bagit.py ...
 
-if [[ `find . | grep DS_Store | xargs ls | wc -l` -eq 0 ]]; then
+dev=false
+
+# TODO add arg parsing
+
+loc_config=~/loc-config
+if [[ $dev == true ]]; then
+  loc_config=~/loc-config-dev
+fi
+
+source $loc_config
+
+if [[ `find "${LOC_PreRelease}/$1" | grep DS_Store | xargs ls | wc -l` -eq 0 ]]; then
   printf "Bagging $@\n\n"
   python3 -m bagit $@ \
   --source-organization "$sourceOrganization" \

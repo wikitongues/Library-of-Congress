@@ -98,6 +98,7 @@ else
     id=$(get_id $i)
 
     if [ -d "$target/$id" ]; then
+      mv ${i} STAGED_${i}
       echo "$id is already staged. Skipping."
       continue
     fi

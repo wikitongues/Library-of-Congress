@@ -80,7 +80,8 @@ var fields = [
   'Sampling rate',
   'Stream size audio',
   'Reference ID [Ethnologue]',
-  'Editing Status'
+  'Editing Status',
+  'Public Status'
 ];
 
 try {
@@ -93,7 +94,7 @@ try {
       cellFormat: "string",
       timeZone: "America/New_York",
       userLocale: "en-ca",
-      filterByFormula: "Identifier='"+identifier+"'",
+      filterByFormula: "Identifier=\""+identifier+"\"",
       fields
   }).eachPage(function page(records, fetchNextPage) {
     if (!Array.isArray(records) || !!records.length) {

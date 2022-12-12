@@ -1,15 +1,23 @@
 #!/bin/bash
 
-# Get oral history id from directory name
-get_id () {
-  id="$(pwd)/$1"
-  id="${id##*/}"
-  echo $id
+# Get S3-compliant identifier
+# TODO move this to a common file
+# source ./loc-functions.sh
+get_compliant_identifier () {
+  # Convert to ascii characters
+  identifier=$(echo $1 | iconv -f UTF-8 -t ascii//TRANSLIT//ignore)
+
+  # Remove characters left by Mac iconv implementation
+  identifier=${identifier//[\'\^\~\"\`]/''}
+
+  # Change + to -
+  identifier=${identifier//\+/'-'}
+
+  echo $identifier
 }
 
 dev=false
 file=''
-video_extension='mp4'
 directories=()
 args=()
 while (( $# )); do
@@ -17,8 +25,6 @@ while (( $# )); do
     -d) dev=true ;;
     -f) shift
       file=$1 ;;
-    --video-extension) shift
-      video_extension=$1 ;;
     *)  args+=("$1") ;;
   esac
   shift
@@ -64,27 +70,29 @@ else
   # Copy the files
   for i in "${directories[@]}"
   do
+    compliant_identifier=$(get_compliant_identifier $i)
+
     # Check for data folder
-    dataDir="${LOC_Staging}/${i}/data"
+    dataDir="${LOC_Staging}/${compliant_identifier}/data"
     if ! [ -d $dataDir ]; then
       echo "Couldn't find data directory: $dataDir"
       echo "Please run loc-bag."
       continue
     fi
 
-    if [ -d "${target}/${i}" ]; then
+    if [ -d "${target}/${compliant_identifier}" ]; then
       echo "${i} is already released. Skipping."
       continue
     fi
 
     if [[ ! $LOC_Mode = "dev" ]]; then
-      python "${LOC_REPO}/uploadFilesToDropbox.py" "${i}"
+      python "${LOC_REPO}/uploadFilesToDropbox.py" "${compliant_identifier}"
       if [ $? -ne 0 ]; then
         echo "Error; ${i} not uploaded to Dropbox."
         continue
       fi
     fi
     echo Moving ${i} to ${target}
-    mv "${LOC_Staging}/${i}" "${target}/${i}"
+    mv "${LOC_Staging}/${compliant_identifier}" "${target}/${compliant_identifier}"
   done
 fi
