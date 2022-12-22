@@ -1,48 +1,89 @@
 # Steps to prepare an oral history folder for ingestion
 
-## Current work:
-Upgrading all the IDv1 Oral Histories to IDv2
-Moving all metadata text files into their respective Oral Histories
-Bag all Oral Histories
-
-## Environments
-- Seed_Bank
-- LOC_PreRelease
-- LOC_Staging
-- LOC_Production
-
-## Commands
-- [x] `loc-install`
-- [x] `loc-setup`
-- [x] `loc-test`
-- [x] `loc-prepare`
-- [x] `loc-flatten`
-- [ ] `loc-prune`
-- [x] `loc-bag`
-- [x] `loc-release`
-- [x] `loc-store`
-
 ## Setup
-Install node dependencies:
+### Prerequisites:
+- MacOS (Tested with Big Sur Version 11.7.1 and `GNU bash, version 3.2.57(1)-release (x86_64-apple-darwin20)`)
+- Python 3 (Tested with 3.7.6)
+- Node.js (Tested with 15.0.1)
+### Install node dependencies:
 ```
 npm install
 ```
-Create config file:
+### Install python dependencies:
+Create a virtual environment:
 ```
-printf "# Wikitongues loc-config\n# This file is required to prepare oral histories for ingestion by the Library of Congress.\nOH=''\nLOC_PreRelease=''\nLOC_Staging=''\nLOC_Production='' > ~/loc-config
+python -m venv env
 ```
-Add Airtable api key and base key to config file (find them here: https://airtable.com/api)
+Activate the virtual environment:
 ```
-LOC_APIKEY=<Your API Key>
-LOC_BASE=<Your Base Key>
+source env/bin/activate
 ```
-Install [bagit](https://github.com/LibraryOfCongress/bagit-python):
+Install dependencies:
 ```
-pip install bagit
+pip install -r requirements.txt
 ```
-Make the scripts executable: run `./loc-install.sh`
+### Create config file:
+Save to `~/loc-config` and fill in the variables:
+```
+# Wikitongues loc-config
+# This file is required to prepare oral histories for ingestion by the Library of Congress.
+
+# Path to local Dropbox folder for Oral Histories
+OH_DROPBOX=''
+
+# Path to local Dropbox LOC_Staging folder
+STAGING_DROPBOX=''
+
+# Path to local folders
+OH=''
+LOC_PreRelease=''
+LOC_Staging=''
+LOC_Production=''
+
+# Airtable API key and base id
+LOC_APIKEY=''
+LOC_BASE=''
+
+# Dropbox API token
+DROPBOX_TOKEN=''
+
+# Local path to this repository
+LOC_REPO=''
+```
+
+Find Airtable API key and base id here: https://airtable.com/api
+
+### Make the scripts executable:
+```
+./loc-install.sh
+```
 
 ## Run
+Activate the virtual environment:
+```
+source env/bin/activate
+```
+
+### Download a batch of oral histories from Dropbox:
+1. Create a text file containing a list of oral history id's to download
+- Hint: One way to do this using [q](https://formulae.brew.sh/formula/q):
+    1. `brew install q`
+    2. Download a csv from Airtable of the View for the batch of oral histories
+    3. `cat /path/to/file.csv | q -d , -H -e utf-8-sig "select Identifier from - ;" > path/to/file.txt`
+2. Validate the oral histories on Dropbox to flag issues:
+```
+./loc-validate.sh /path/to/file.txt
+```
+- Checks for missing video file, missing thumbnail image file, or identifier not found
+- The script checks your local Dropbox folder instead of using the API, so make sure it is synced first!
+3. Download batch of valid oral histories from Dropbox to the `OH` folder (recommendation: copy the valid oral history id's from step 2 to a separate file):
+```
+./loc-download.sh /path/to/file.txt
+```
+- Any oral histories already found in the `OH` directory will be skipped. To overwrite them: `./loc-download.sh -o /path/to/file.txt`
+- To perform a dry run (without downloading anything): `./loc-download.sh -d /path/to/file.txt`
+
+### Process downloaded oral histories:
 To run for one or more specific directory:
 ```
 loc directory1 directory2 ...
@@ -64,6 +105,16 @@ To provide a file containing newline-separated directory names:
 loc -f /path/to/file
 ```
 
+### Upload processed oral histories to Dropbox:
+To run for one or more specific directory:
+```
+./loc-store.sh directory1 directory2 ...
+```
+To provide a file containing newline-separated directory names:
+```
+./loc-store.sh -f /path/to/file
+```
+
 ### For local testing:
 Copy ~/loc-config to ~/loc-config-dev and change settings as desired for testing. To run in dev mode:
 ```
@@ -73,23 +124,4 @@ To bypass Airtable lookup, add this line to ~/loc-config-dev:
 ```
 LOC_Mode='dev'
 ```
-
-## Steps
-0. Run `$ ./loc-install.sh` from within this repository to make all scripts executable.
-1. Run `$ loc-setup` from your *locally synced* Dropbox Oral Histories directory.
-2. Run `$ loc-test` from anywhere to create a dummy Oral History directory.
-3. Run `$ loc-prepare [directory]` to create a copy of the desired oral history folder from Seed_Bank parent directory to LOC_PreRelease directory.
-4. Run `$ loc-flatten [directory]` to process the directory into the acceptable LOC structure.
-5. Run `$ loc-prune [directory]` to enter an interactive process to identify which files to keep according to the LOC structure.
-6. Run `$ loc-bag [directory]` to prepare the directory for ingestion.
-7. Run `$ loc-release [directory]` to move directory from LOC_PreRelease to LOC_Staging for ingestion by Library of Congress.
-8. Run `$ loc-store [directory]` to move directory from LOC_Staging to LOC_Production once the oral history bag has been ingested by the Library of Congress for in-house long-term storage.
-
-# Notes for Fred
-Once the contents of LOC_Staging have been successfully ingested by the team at LOC, run `$ loc-store` from within `LOC_Staging/.` to move all directories from LOC_Staging to LOC_Production.
-
-`$ loc-test` makes a dummy oral history folder to test scripting with.
-
-remove raws and edited from pruned filenames
-
-remove accents
+To make a dummy oral history folder for testing, `cd` into your test `OH` directory and run `loc-test <identifier>`.

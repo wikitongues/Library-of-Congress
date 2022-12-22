@@ -35,9 +35,9 @@ set_thumbnail () {
 
 set_video () {
   echo "${1}. Setting Video..."
-  if [[ -f ${obj}.mp4 ]]; then
-    video="${obj}__video_edited.mp4"
-    mv ${obj}.mp4 ${video}
+  if [[ -f ${obj}.${video_extension} ]]; then
+    video="${obj}__video_edited.${video_extension}"
+    mv ${obj}.${video_extension} ${video}
     echo "Video set as: ${video}"
   else
     # account for pre-processed files
@@ -107,7 +107,7 @@ hoister () {
 cleaner () {
   # remove empty directory
   echo "${1}. Cleaning up empty directories."
-  find . -type d | tail -r | xargs rmdir 2>/dev/null
+  find "${LOC_PreRelease}/${i}" -type d | tail -r | xargs rmdir 2>/dev/null
 }
 
 # rename raws/... to ___raws
@@ -126,10 +126,13 @@ raw_flattener () {
 }
 
 dev=false
+video_extension='mp4'
 args=()
 while (( $# )); do
   case $1 in
     -d) dev=true ;;
+    --video-extension) shift
+      video_extension=$1 ;;
     *)  args+=("$1") ;;
   esac
   shift

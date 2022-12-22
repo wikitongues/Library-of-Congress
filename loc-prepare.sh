@@ -31,9 +31,15 @@ else
       echo Copying ${i} to PreRelease: ${target}
 
       # Copies directory to PreRelease, deleting any existing directory with the same id
-      rsync -a --delete "${i}/" "${target}/loctemp__$i/"
+      rsync -a --delete "${OH}/${i}/" "${target}/loctemp__$i/"
+      if [ $? -ne 0 ]; then
+        echo "Error; ${i} not copied to PreRelease."
+        rm -r "${target}/loctemp__$i/"
+        exit 1
+      fi
+
       dot_clean "${target}/loctemp__$i"
-      
+
       echo ${i} is now loctemp__${i}
       echo "Done. Next, from within ./LOC_PreRelease, run loc-flatten loctemp__${i} to process the directory into the acceptable LOC structure."
     done

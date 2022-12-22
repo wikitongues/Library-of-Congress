@@ -12,45 +12,45 @@ var fields = [
   'Title',
   'Creator',
   'Description',
-  'Subject: Top level genealogy per language',
-  'Subject: Language Continent of Origin',
-  'Subject: Language Nation of Origin',
-  'Subject: Speaker Genders',
-  'Contributor: Speakers',
-  'Contributor: Caption Authors',
-  'Contributor: Videographer',
-  'Contributor: Description',
+  'Subject [Language: Genealogy]',
+  'Subject [Language: Continent of Origin]',
+  'Subject [Language: Nation of Origin]',
+  'Subject [Speaker Genders]',
+  'Creator [Speakers]',
+  'Creator [Caption Authors]',
+  'Creator [Videographer]',
+  'Creator [Facilitator]',
   'Date Created',
   'Type',
   'Format',
-  'Language names',
-  'Languages: Speaker preferred names',
-  'Languages: ISO Code (639-3)',
-  'Languages: Glottocode',
-  'Languages: Dialect Glottocode',
-  'Languages: Macrolanguage ISO Code',
-  'Caption Languages',
-  'Caption Languages: ISO Code (639-6)',
-  'Caption Languages: Glottocode',
-  'Caption File Identifier',
-  'Caption File Links',
-  'Coverage: Video Nation',
-  'Coverage: Video Territory',
-  'Coverage: Distribution',
+  'Language [Speaker preferred name]',
+  'Language [ISO Code 639-3]',
+  'Language [Ethnologue Name]',
+  'Language [Glottocode]',
+  'Language [Dialect Glottocode]',
+  'Language [Macro: ISO Code 639-3]',
+  'Caption [Language: Ethnologue name]',
+  'Caption [Language: ISO Code 639-3]',
+  'Caption [Language: Glottocode]',
+  'Caption [File: Identifier]',
+  'Caption [File: Link]',
+  'Coverage [Video Nation]',
+  'Coverage [Video Territory]',
+  'Coverage [Distribution]',
   'Rights',
   'Publisher',
   'Date Received',
   'Encoded Data',
   'Tagged Data',
   'Duration',
-  'Format T',
-  'Format Profile',
+  'Format [Type]',
+  'Format [Profile]',
   'Codec ID',
   'File size',
-  'Format Info',
-  'Format Settings',
-  'Format Settings CABAC',
-  'Format Settings ReFrames',
+  'Format [Info]',
+  'Format [Settings]',
+  'Format [Settings: CABAC]',
+  'Format [Settings: ReFrames]',
   'Codec ID/Info',
   'Bit rate',
   'Width',
@@ -79,7 +79,9 @@ var fields = [
   'Compression mode',
   'Sampling rate',
   'Stream size audio',
-  'Subjects Reference ID: Ethnologue'
+  'Reference ID [Ethnologue]',
+  'Editing Status',
+  'Public Status'
 ];
 
 try {
@@ -88,11 +90,11 @@ try {
   var identifier = single.replace(/\+/g, '-');
 
   base('Oral Histories').select({
-      view: "Archival View (Comprehensive)",
+      view: "Public Archival View",
       cellFormat: "string",
       timeZone: "America/New_York",
       userLocale: "en-ca",
-      filterByFormula: "Identifier='"+identifier+"'",
+      filterByFormula: "Identifier=\""+identifier+"\"",
       fields
   }).eachPage(function page(records, fetchNextPage) {
     if (!Array.isArray(records) || !!records.length) {
@@ -101,7 +103,7 @@ try {
             `Metadata for ${record.get('Identifier')}`,
 
             ...fields.map(field => `${field}: ${record.get(field)}`)
-          ].join('\n');
+          ].join('\n') + '\r\n';
 
           fs.writeFileSync(`${destination}/loctemp__${single}/${single}__metadata.txt`, content);
       });
@@ -111,8 +113,8 @@ try {
       return process.exit(1);
     }
   }, function done(err) {
-      if (err) { 
-        console.error(err); 
+      if (err) {
+        console.error(err);
         return process.exit(1);
       }
   });
