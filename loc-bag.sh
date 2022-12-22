@@ -5,12 +5,24 @@
 
 # Produces the description for the "internalSenderDescription" field. Example:
 # Wikitongues Oral History directory containing bag-info,bagit,ceb/data/temp:,ceb/data:,data,edited,edited,manifest-sha256,manifest-sha512,raw,raw,raw,raw,raw,raw,raw,raw,tagmanifest-sha256,tagmanifest-sha512,temp
-get_id () {
-  id="$(pwd)/$1"
-  id="${id##*/}"
-  id="${id##loctemp__}"
-  echo $id
-}
+
+dev=false
+while (( $# )); do
+  case $1 in
+    -d) dev=true ;;
+    *)  args+=("$1") ;;
+  esac
+  shift
+done
+set -- "${args[@]}"
+
+loc_config=~/loc-config
+if [[ $dev == true ]]; then
+  loc_config=~/loc-config-dev
+fi
+
+source $loc_config
+source "${LOC_REPO}/loc-functions.sh"
 
 bagId=`get_id $@`
 
@@ -43,17 +55,6 @@ bagitProfileIdentifier=""
 
 # alt: python /usr/local/lib/python3.7/site-packages/bagit.py ...
 
-dev=false
-
-# TODO add arg parsing
-
-loc_config=~/loc-config
-if [[ $dev == true ]]; then
-  loc_config=~/loc-config-dev
-fi
-
-source $loc_config
-
 if [[ `find "${LOC_PreRelease}/$1" | grep DS_Store | xargs ls | wc -l` -eq 0 ]]; then
   printf "Bagging $@\n\n"
   python3 -m bagit $@ \
@@ -71,7 +72,7 @@ if [[ `find "${LOC_PreRelease}/$1" | grep DS_Store | xargs ls | wc -l` -eq 0 ]];
   # --bag-group-identifier "$bagGroupIdentifier" \
   # --bagit-profile-identifier "$bagitProfileIdentifier" \
 
-  printf "\nDone. Bagged ${bagId}.\nNext run loc-release ${@} to move directory from LOC_PreRelease to LOC_Staging."
+  printf "\nDone. Bagged ${bagId}.\nNext run loc-release ${@} to move directory from LOC_PreRelease to LOC_Staging.\n"
 else
   echo "There are DS_Store files lingering around. For more information, run 'find . | grep DS_Store | xargs ls'"
   echo "To remove, run 'find . | grep DS_Store | xargs rm'"

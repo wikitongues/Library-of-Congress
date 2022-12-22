@@ -34,20 +34,6 @@ get_dropbox_identifier () {
   echo $dropbox_identifier
 }
 
-# Get S3-compliant identifier
-get_compliant_identifier () {
-  # Convert to ascii characters
-  identifier=$(echo $1 | iconv -f UTF-8 -t ascii//TRANSLIT//ignore)
-
-  # Remove characters left by Mac iconv implementation
-  identifier=${identifier//[\'\^\~\"\`]/''}
-
-  # Change + to -
-  identifier=${identifier//\+/'-'}
-
-  echo $identifier
-}
-
 if [ -z "$1" ]; then
   printf "Usage: $ loc <directory name>\nPlease make sure you reference a desired oral history directory to prepare.\n"
   exit 1
@@ -153,6 +139,7 @@ if ! [[ -f "$loc_config" ]]; then
 fi
 
 source $loc_config
+source "${LOC_REPO}/loc-functions.sh"
 
 if [[ $LOC_Mode = "dev" ]]; then
   echo "Running in dev mode. Will not check metadata."

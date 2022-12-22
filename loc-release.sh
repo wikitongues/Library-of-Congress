@@ -1,13 +1,5 @@
 #!/bin/bash
 
-# Get oral history id from directory name
-get_id () {
-  id="$(pwd)/$1"
-  id="${id##*/}"
-  id="${id##loctemp__}"
-  echo $id
-}
-
 dev=false
 video_extension='mp4'
 args=()
@@ -30,6 +22,16 @@ fi
 if [ -z "$1" ]; then
   printf "Usage: $ loc-release <directory name>\nPlease make sure you reference a desired oral history directory to release.\n"
 else
+  # Check for config file
+  if [[ -f $loc_config ]]; then
+    source $loc_config
+    target="$LOC_Staging"
+  else
+    echo "Couldn't find loc-config. Please run loc-setup."
+    exit 1
+  fi
+  source "${LOC_REPO}/loc-functions.sh"
+
   for i in "$@"
   do
     # Check directory name
@@ -78,18 +80,10 @@ else
       exit 1
     fi
 
-    # Check for config file
-    if [[ -f $loc_config ]]; then
-      source $loc_config
-      target="$LOC_Staging"
-
-      # Ensure that directory is in LOC_PreRelease
-      if ! [ $(tr '[:upper:]' '[:lower:]' <<< $(dirname $(pwd)/$i)) = $(tr '[:upper:]' '[:lower:]' <<< $LOC_PreRelease) ]; then
-        echo "The given directory was not found in the LOC_PreRelease directory."
-        exit 1
-      fi
-    else
-      echo "Couldn't find loc-config. Please run loc-setup."
+    # Ensure that directory is in LOC_PreRelease
+    if ! [ $(tr '[:upper:]' '[:lower:]' <<< $(dirname $(pwd)/$i)) = $(tr '[:upper:]' '[:lower:]' <<< $LOC_PreRelease) ]; then
+      echo "The given directory ${i} was not found in the LOC_PreRelease directory."
+      exit 1
     fi
   done
 

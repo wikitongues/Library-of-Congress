@@ -1,21 +1,5 @@
 #!/bin/bash
 
-# Get S3-compliant identifier
-# TODO move this to a common file
-# source ./loc-functions.sh
-get_compliant_identifier () {
-  # Convert to ascii characters
-  identifier=$(echo $1 | iconv -f UTF-8 -t ascii//TRANSLIT//ignore)
-
-  # Remove characters left by Mac iconv implementation
-  identifier=${identifier//[\'\^\~\"\`]/''}
-
-  # Change + to -
-  identifier=${identifier//\+/'-'}
-
-  echo $identifier
-}
-
 dev=false
 file=''
 directories=()
@@ -56,11 +40,14 @@ fi
 
 # Check for config file
 if [[ -f $loc_config ]]; then
-    source $loc_config
-    target="$LOC_Production"
+  source $loc_config
+  target="$LOC_Production"
 else
-    echo "Couldn't find loc-config. Please run loc-setup."
+  echo "Couldn't find loc-config. Please run loc-setup."
+  exit 1
 fi
+
+source "${LOC_REPO}/loc-functions.sh"
 
 export LOC_Staging STAGING_DROPBOX DROPBOX_TOKEN
 

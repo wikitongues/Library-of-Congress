@@ -70,11 +70,17 @@ source env/bin/activate
     1. `brew install q`
     2. Download a csv from Airtable of the View for the batch of oral histories
     3. `cat /path/to/file.csv | q -d , -H -e utf-8-sig "select Identifier from - ;" > path/to/file.txt`
-2. Validate the oral histories on Dropbox to flag issues: `./loc-validate /path/to/file.txt`
+2. Validate the oral histories on Dropbox to flag issues:
+```
+./loc-validate.sh /path/to/file.txt
+```
 - Checks for missing video file, missing thumbnail image file, or identifier not found
 - The script checks your local Dropbox folder instead of using the API, so make sure it is synced first!
-3. `./loc-download.sh /path/to/file.txt`
-- Any oral histories already found in the `OH` directory will be skipped. To overwrite them: `./loc-download.sh -i /path/to/file.txt`
+3. Download batch of valid oral histories from Dropbox to the `OH` folder (recommendation: copy the valid oral history id's from step 2 to a separate file):
+```
+./loc-download.sh /path/to/file.txt
+```
+- Any oral histories already found in the `OH` directory will be skipped. To overwrite them: `./loc-download.sh -o /path/to/file.txt`
 - To perform a dry run (without downloading anything): `./loc-download.sh -d /path/to/file.txt`
 
 ### Process downloaded oral histories:
