@@ -11,8 +11,9 @@ DROPBOX_TOKEN = os.environ["DROPBOX_TOKEN"]
 identifier = sys.argv[1]
 
 CHUNK_SIZE = 4 * 1024 * 1024
+TIMEOUT = 900
 
-dbx = dropbox.Dropbox(DROPBOX_TOKEN)
+dbx = dropbox.Dropbox(DROPBOX_TOKEN, timeout=TIMEOUT)
 
 # https://stackoverflow.com/a/33828537
 # https://stackoverflow.com/a/37399658
