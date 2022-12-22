@@ -21,6 +21,6 @@
   },
   "homepage": "https://github.com/wikitongues/Library-of-Congress",
   "dependencies": {
-    "airtable": "^0.10.0"
+    "airtable": "^0.10.1"
   }
 }
