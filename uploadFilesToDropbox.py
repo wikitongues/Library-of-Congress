@@ -25,31 +25,21 @@ def upload(file_path: str) -> None:
     with open(file_path, "rb") as f:
         file_size = os.path.getsize(file_path)
         if file_size <= CHUNK_SIZE:
-            dbx.files_upload(
-                f.read(), target_path, mode=dropbox.files.WriteMode.overwrite
-            )
+            dbx.files_upload(f.read(), target_path, mode=dropbox.files.WriteMode.overwrite)
         else:
             with tqdm(total=file_size, desc="Uploaded") as pbar:
-                upload_session_start_result = dbx.files_upload_session_start(
-                    f.read(CHUNK_SIZE)
-                )
+                upload_session_start_result = dbx.files_upload_session_start(f.read(CHUNK_SIZE))
                 pbar.update(CHUNK_SIZE)
                 cursor = dropbox.files.UploadSessionCursor(
                     session_id=upload_session_start_result.session_id,
                     offset=f.tell(),
                 )
-                commit = dropbox.files.CommitInfo(
-                    path=target_path, mode=dropbox.files.WriteMode.overwrite
-                )
+                commit = dropbox.files.CommitInfo(path=target_path, mode=dropbox.files.WriteMode.overwrite)
                 while f.tell() < file_size:
                     if (file_size - f.tell()) <= CHUNK_SIZE:
-                        dbx.files_upload_session_finish(
-                            f.read(CHUNK_SIZE), cursor, commit
-                        )
+                        dbx.files_upload_session_finish(f.read(CHUNK_SIZE), cursor, commit)
                     else:
-                        dbx.files_upload_session_append_v2(
-                            f.read(CHUNK_SIZE), cursor
-                        )
+                        dbx.files_upload_session_append_v2(f.read(CHUNK_SIZE), cursor)
                         cursor.offset = f.tell()
                     pbar.update(CHUNK_SIZE)
 

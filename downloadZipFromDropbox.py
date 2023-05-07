@@ -12,6 +12,4 @@ OH_DROPBOX = "/Teamwide/1_Oral_Histories"
 
 dbx = dropbox.Dropbox(DROPBOX_TOKEN)
 
-dbx.files_download_zip_to_file(
-    f"{OH}/{identifier}.zip", f"{OH_DROPBOX}/{identifier}"
-)
+dbx.files_download_zip_to_file(f"{OH}/{identifier}.zip", f"{OH_DROPBOX}/{identifier}")

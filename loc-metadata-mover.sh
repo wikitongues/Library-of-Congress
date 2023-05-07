@@ -45,4 +45,3 @@ for f in `ls -1 $source`; do
     echo $f >> ~/loc-missing
   fi
 done
-

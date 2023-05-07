@@ -3,7 +3,7 @@
 ## Setup
 ### Prerequisites:
 - MacOS (Tested with Big Sur Version 11.7.1 and `GNU bash, version 3.2.57(1)-release (x86_64-apple-darwin20)`)
-- Python 3 (Tested with 3.7.6)
+- Python 3.9
 - Node.js (Tested with 15.0.1)
 ### Install node dependencies:
 ```
@@ -12,7 +12,7 @@ npm install
 ### Install python dependencies:
 Create a virtual environment:
 ```
-python -m venv env
+python3.9 -m venv env
 ```
 Activate the virtual environment:
 ```
@@ -23,8 +23,8 @@ Install dependencies:
 pip install -r requirements.txt
 ```
 ### Create config file:
-Save to `~/loc-config` and fill in the variables:
-```
+Copy the text below to `~/loc-config` and fill in the variables:
+```bash
 # Wikitongues loc-config
 # This file is required to prepare oral histories for ingestion by the Library of Congress.
 
@@ -40,18 +40,32 @@ LOC_PreRelease=''
 LOC_Staging=''
 LOC_Production=''
 
-# Airtable API key and base id
+# Airtable API key and base id (see below)
 LOC_APIKEY=''
 LOC_BASE=''
 
-# Dropbox API token
+# Dropbox API params (see below)
 DROPBOX_TOKEN=''
+DROPBOX_ROOT_NAMESPACE_ID=''
 
 # Local path to this repository
 LOC_REPO=''
 ```
 
+### Find Airtable API parameters
 Find Airtable API key and base id here: https://airtable.com/api
+
+If you need a development environment, create a separate file `~/loc-config-dev` with your dev settings.
+
+### Find Dropbox API parameters
+Follow instructions to get your access token: https://dropbox.tech/developers/generate-an-access-token-for-your-own-account
+
+You will also need to find the "root namespace id" to access teamwide files from your account via the API. You can use the Python library to find this in the interactive shell:
+```python
+>>> import dropbox
+>>> dbx = dropbox.Dropbox("<your token>")
+>>> dbx.users_get_current_account().root_info.root_namespace_id
+```
 
 ### Make the scripts executable:
 ```
@@ -59,6 +73,41 @@ Find Airtable API key and base id here: https://airtable.com/api
 ```
 
 ## Run
+Activate the virtual environment:
+```
+source env/bin/activate
+```
+
+Run:
+```
+python loc.py
+```
+
+Run in dev mode (using settings from `~/loc-config-dev`):
+```
+python loc.py -d
+```
+
+## Develop
+This repository uses [pre-commit](https://pre-commit.com/) hooks to keep the code consistently formatted and readable, making for a good development experience for everyone who contributes to the code. Install pre-commit in your local environment before making your first commit:
+```
+pre-commit install
+```
+When you run `git commit`, the following hooks will be run:
+* [check-yaml](https://github.com/pre-commit/pre-commit-hooks#check-yaml)
+* [end-of-file-fixer](https://github.com/pre-commit/pre-commit-hooks#end-of-file-fixer)
+* [trailing-whitespace](https://github.com/pre-commit/pre-commit-hooks#trailing-whitespace)
+* [black](https://github.com/psf/black) (code formatter)
+* [isort](https://github.com/pycqa/isort) (sorts `import` statements)
+
+If any of the hooks "fails", it will make formatting changes to the offending files and prevent the commit. Simply stage the additional changes and re-run your `git commit` command if this occurs.
+
+If you use Visual Studio Code, you can install these helpful extensions to fix formatting as you code:
+* cornflakes-linter: highlight flake8 style guide problems
+* EditorConfig: Automatically fix whitespace problems
+
+
+## Run (V1)
 Activate the virtual environment:
 ```
 source env/bin/activate
