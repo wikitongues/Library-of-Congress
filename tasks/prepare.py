@@ -6,10 +6,10 @@ from pathlib import Path
 
 import luigi
 
-from archival_target import ArchivalTarget
-from archival_task import ArchivalTask, ArchivalTaskError
-from constants import VALID_VIDEO_EXTENSIONS
-from download import Download
+from .archival_target import ArchivalTarget
+from .archival_task import ArchivalTask, ArchivalTaskError
+from .constants import VALID_VIDEO_EXTENSIONS
+from .download import Download
 
 
 class PrepareTarget(ArchivalTarget):
@@ -59,7 +59,7 @@ class Prepare(ArchivalTask):
         return Path(self.input().path).name
 
     def prepare_pre_release_directory(self):
-        status = subprocess.call(["./loc-prepare.sh", *(["-d"] if self.dev else []), self.dropbox_identifier])
+        status = subprocess.call(["./scripts/loc-prepare.sh", *(["-d"] if self.dev else []), self.dropbox_identifier])
         if status != 0:
             raise ArchivalTaskError("loc-prepare failed!")
 

@@ -3,12 +3,15 @@ from pathlib import Path
 
 import luigi
 
-from archival_target import ArchivalTarget
-from archival_task import ArchivalTask
-from fetch_metadata import FetchMetadata
+from .archival_target import ArchivalTarget
+from .archival_task import ArchivalTask
+from .fetch_metadata import FetchMetadata
 
 
 class RenameTarget(ArchivalTarget):
+    def __init__(self, path):
+        super().__init__(path)
+
     def exists(self):
         # TODO
         return self.fs.exists(self.path)
@@ -39,4 +42,3 @@ class Rename(ArchivalTask):
             loctemp_path / f"{self.compliant_oh_id}__metadata.txt"
         )
         loctemp_path.rename(compliant_loctemp_path)
-        pass

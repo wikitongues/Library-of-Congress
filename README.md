@@ -69,7 +69,7 @@ You will also need to find the "root namespace id" to access teamwide files from
 
 ### Make the scripts executable:
 ```
-./loc-install.sh
+./scripts/loc-install.sh
 ```
 
 ## Run
@@ -111,6 +111,11 @@ If you use Visual Studio Code, you can install these helpful extensions to fix f
 Activate the virtual environment:
 ```
 source env/bin/activate
+```
+
+Change to scripts directory:
+```
+cd scripts
 ```
 
 ### Download a batch of oral histories from Dropbox:

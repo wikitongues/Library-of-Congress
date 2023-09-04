@@ -1,7 +1,7 @@
 import luigi
 
-from archival_task import ArchivalTask
-from prepare import Prepare
+from .archival_task import ArchivalTask
+from .prepare import Prepare
 
 
 class FetchMetadata(ArchivalTask):

@@ -1,8 +1,8 @@
 import luigi
 
-from archival_target import ArchivalTarget
-from archival_task import ArchivalTask
-from fetch_metadata import FetchMetadata
+from .archival_target import ArchivalTarget
+from .archival_task import ArchivalTask
+from .fetch_metadata import FetchMetadata
 
 
 class FlattenTarget(ArchivalTarget):

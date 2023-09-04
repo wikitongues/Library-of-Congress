@@ -7,9 +7,7 @@ from typing import List
 
 import luigi
 
-from prepare import Prepare
-
-# from .upload import Upload
+from tasks.prepare import Prepare
 
 
 def init_env(dev: bool) -> None:
@@ -45,13 +43,8 @@ def run():
         [
             Prepare(
                 oh_id=oh_id,  # The id on Airtable (may contain diacritics)
-                compliant_oh_id=get_compliant_oh_id(oh_id),
                 dev=args.dev,
             )
-            # Upload(
-            #     oh_id=oh_id,  # The id on Airtable (may contain diacritics)
-            #     compliant_oh_id=get_compliant_oh_id(oh_id),
-            # )
             for oh_id in get_eligible_oral_history_ids()
         ],
         local_scheduler=True,

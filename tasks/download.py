@@ -6,7 +6,7 @@ from zipfile import ZipFile
 import dropbox
 import luigi
 
-from archival_task import ArchivalTask
+from .archival_task import ArchivalTask
 
 
 class Download(ArchivalTask):

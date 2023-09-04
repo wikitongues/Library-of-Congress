@@ -1,7 +1,14 @@
 import luigi
 
-from archival_task import ArchivalTask
-from bag import Bag
+from .archival_target import ArchivalTarget
+from .archival_task import ArchivalTask
+from .bag import Bag
+
+
+class ReleaseTarget(ArchivalTarget):
+    def exists(self):
+        # TODO
+        return False
 
 
 class Release(ArchivalTask):
@@ -15,7 +22,7 @@ class Release(ArchivalTask):
         )
 
     def output(self):
-        return luigi.LocalTarget(f"{self.local_staging_dir}/{self.compliant_oh_id}/")
+        return ReleaseTarget()
 
     def run(self):
         # TODO

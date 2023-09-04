@@ -5,8 +5,8 @@ import dropbox
 import luigi
 from tqdm import tqdm
 
-from archival_task import ArchivalTask
-from release import Release
+from .archival_task import ArchivalTask
+from .release import Release
 
 CHUNK_SIZE = 4 * 1024 * 1024
 TIMEOUT = 900

@@ -1,7 +1,14 @@
 import luigi
 
-from archival_task import ArchivalTask
-from flatten import Flatten
+from .archival_target import ArchivalTarget
+from .archival_task import ArchivalTask
+from .flatten import Flatten
+
+
+class BagTarget(ArchivalTarget):
+    def exists(self):
+        # TODO
+        return False
 
 
 class Bag(ArchivalTask):
@@ -15,8 +22,7 @@ class Bag(ArchivalTask):
         )
 
     def output(self):
-        # TODO better way to create target for bagged directory?
-        return luigi.LocalTarget(f"{self.pre_release_dir}/bagged__{self.compliant_oh_id}/")
+        return BagTarget()
 
     def run(self):
         # TODO
