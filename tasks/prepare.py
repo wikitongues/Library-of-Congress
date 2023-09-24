@@ -40,7 +40,6 @@ class NoVideo(ArchivalTaskError):
 
 class Prepare(ArchivalTask):
     oh_id = luigi.Parameter()
-    dev = luigi.Parameter(default=True)
 
     def requires(self):
         return Download(

@@ -5,6 +5,8 @@ import luigi
 
 
 class ArchivalTask(luigi.Task):
+    dev = luigi.Parameter(default=True)
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.local_oh_dir = os.environ["OH"]
@@ -14,6 +16,8 @@ class ArchivalTask(luigi.Task):
         self.pre_release_dir = os.environ["LOC_PreRelease"]
         self.local_staging_dir = os.environ["LOC_Staging"]
         self.dropbox_staging_dir = os.environ["STAGING_DROPBOX"]
+        self.airtable_api_key = os.environ["LOC_APIKEY"]
+        self.airtable_base_id = os.environ["LOC_BASE"]
 
         self.logger = logging.getLogger("luigi-interface")
 
