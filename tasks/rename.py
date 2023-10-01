@@ -5,7 +5,7 @@ import luigi
 
 from .archival_target import ArchivalTarget
 from .archival_task import ArchivalTask
-from .fetch_metadata import FetchMetadata
+from .write_metadata import WriteMetadata
 
 
 class RenameTarget(ArchivalTarget):
@@ -22,7 +22,7 @@ class Rename(ArchivalTask):
     compliant_oh_id = luigi.Parameter()
 
     def requires(self):
-        return FetchMetadata(oh_id=self.oh_id)
+        return WriteMetadata(oh_id=self.oh_id)
 
     def output(self):
         return RenameTarget(f"{self.pre_release_dir}/flattened__{self.compliant_oh_id}/")

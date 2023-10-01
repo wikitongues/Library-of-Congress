@@ -3,11 +3,15 @@ import os
 import shlex
 import subprocess
 from pathlib import Path
-from typing import List
+from typing import Iterable
 
 import luigi
+from wt_airtable_client import AirtableConnectionInfo, AirtableHttpClient, AirtableRecord, AirtableTableInfo, CellFormat
 
-from tasks.prepare import Prepare
+from tasks.write_metadata import WriteMetadata
+
+OH_TABLE = "Oral Histories"
+OH_ID_COLUMN = "Identifier"
 
 
 def init_env(dev: bool) -> None:
@@ -22,9 +26,13 @@ def init_env(dev: bool) -> None:
     proc.communicate()
 
 
-def get_eligible_oral_history_ids() -> List[str]:
-    # TODO
-    return []
+def get_eligible_oral_history_records(airtable_client: AirtableHttpClient) -> Iterable[AirtableRecord]:
+    return airtable_client.get_records_by_fields(
+        {},  # TODO
+        cell_format=CellFormat.STRING,
+        time_zone="America/New_York",
+        user_locale="en-ca",
+    )
 
 
 def get_compliant_oh_id(oh_id: str) -> str:
@@ -39,13 +47,19 @@ def run():
 
     init_env(args.dev)
 
+    airtable_client = AirtableHttpClient(
+        AirtableConnectionInfo(os.environ["LOC_BASE"], os.environ["LOC_APIKEY"]),
+        AirtableTableInfo(OH_TABLE, OH_ID_COLUMN),
+    )
+
     luigi.build(
         [
-            Prepare(
-                oh_id=oh_id,  # The id on Airtable (may contain diacritics)
+            WriteMetadata(
+                oh_id=oh.fields["Identifier"],  # The id on Airtable (may contain diacritics)
+                metadata=oh.fields,
                 dev=args.dev,
             )
-            for oh_id in get_eligible_oral_history_ids()
+            for oh in get_eligible_oral_history_records(airtable_client)
         ],
         local_scheduler=True,
     )

@@ -1,5 +1,4 @@
 import luigi
-from wt_airtable_client import AirtableConnectionInfo, AirtableHttpClient, AirtableTableInfo, CellFormat
 
 from .archival_task import ArchivalTask
 from .prepare import Prepare
@@ -84,8 +83,9 @@ METADATA_FIELDS = [
 ]
 
 
-class FetchMetadata(ArchivalTask):
+class WriteMetadata(ArchivalTask):
     oh_id = luigi.Parameter()
+    metadata = luigi.DictParameter()
 
     @property
     def metadata_path(self):
@@ -98,18 +98,11 @@ class FetchMetadata(ArchivalTask):
         return luigi.LocalTarget(self.metadata_path)
 
     def run(self):
-        client = AirtableHttpClient(
-            AirtableConnectionInfo(self.airtable_base_id, self.airtable_api_key),
-            AirtableTableInfo(OH_TABLE, OH_ID_COLUMN),
-        )
-        oh_record = client.get_record(
-            self.oh_id, cell_format=CellFormat.STRING, time_zone="America/New_York", user_locale="en-ca"
-        )
         content = (
             "\n".join(
                 [
                     f"Metadata for {self.oh_id}",
-                    *[f"{field}: {oh_record.get(field)}" for field in METADATA_FIELDS],
+                    *[f"{field}: {self.metadata.get(field)}" for field in METADATA_FIELDS],
                 ]
             )
             + "\r\n"

@@ -25,4 +25,4 @@ tornado==6.2
 tqdm==4.64.1
 urllib3==1.26.11
 virtualenv==20.23.0
-wt-airtable-client @ git+https://github.com/wikitongues/Airtable-Client@d4f7ecf15d424f1d7ed3ce0d45fa2af7cee12b0c
+wt-airtable-client @ git+https://github.com/wikitongues/Airtable-Client.git@edf95b28200a3b5593e8588eed2022e87f5d3b90

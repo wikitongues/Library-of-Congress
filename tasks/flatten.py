@@ -2,7 +2,7 @@ import luigi
 
 from .archival_target import ArchivalTarget
 from .archival_task import ArchivalTask
-from .fetch_metadata import FetchMetadata
+from .rename import Rename
 
 
 class FlattenTarget(ArchivalTarget):
@@ -16,7 +16,7 @@ class Flatten(ArchivalTask):
     compliant_oh_id = luigi.Parameter()
 
     def requires(self):
-        return FetchMetadata(
+        return Rename(
             oh_id=self.oh_id,
             compliant_oh_id=self.compliant_oh_id,
         )
