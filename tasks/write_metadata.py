@@ -1,6 +1,10 @@
+from functools import cached_property
+from pathlib import Path
+
 import luigi
 
 from .archival_task import ArchivalTask
+from .constants import METADATA_SUFFIX
 from .prepare import Prepare
 
 OH_TABLE = "Oral Histories"
@@ -84,18 +88,20 @@ METADATA_FIELDS = [
 
 
 class WriteMetadata(ArchivalTask):
-    oh_id = luigi.Parameter()
-    metadata = luigi.DictParameter()
-
-    @property
-    def metadata_path(self):
-        return f"{self.pre_release_dir}/loctemp__{self.oh_id}/{self.oh_id}__metadata.txt"
-
     def requires(self):
-        return Prepare(oh_id=self.oh_id)
+        return Prepare(**self.param_kwargs)
 
     def output(self):
         return luigi.LocalTarget(self.metadata_path)
+
+    @cached_property
+    def loctemp_folder_name(self) -> str:
+        return Path(self.input().path).name
+
+    @property
+    def metadata_path(self):
+        loctemp_path = Path(self.pre_release_dir) / self.loctemp_folder_name
+        return f"{loctemp_path}/{self.dropbox_identifier}{METADATA_SUFFIX}"
 
     def run(self):
         content = (

@@ -1,6 +1,5 @@
 import os
 import shutil
-from functools import cached_property
 from zipfile import ZipFile
 
 import dropbox
@@ -10,20 +9,12 @@ from .archival_task import ArchivalTask
 
 
 class Download(ArchivalTask):
-    oh_id = luigi.Parameter()
-
-    @cached_property
-    def dropbox_folder_name(self) -> str:
-        # TODO
-        # Attempt to locate the correct folder on Dropbox - may be a legacy identifier format
-        return self.oh_id
-
     @property
     def zip_path(self) -> str:
-        return f"{self.local_oh_dir}/{self.dropbox_folder_name}.zip"
+        return f"{self.local_oh_dir}/{self.dropbox_identifier}.zip"
 
     def output(self):
-        return luigi.LocalTarget(f"{self.local_oh_dir}/{self.dropbox_folder_name}/")
+        return luigi.LocalTarget(f"{self.local_oh_dir}/{self.dropbox_identifier}/")
 
     def validate(self):
         # TODO
@@ -35,7 +26,7 @@ class Download(ArchivalTask):
         dbx = dropbox.Dropbox(self.dropbox_token).with_path_root(
             dropbox.common.PathRoot.root(self.dropbox_root_namespace_id)
         )
-        dropbox_path = f"{self.dropbox_oh_dir}/{self.dropbox_folder_name}"
+        dropbox_path = f"{self.dropbox_oh_dir}/{self.dropbox_identifier}"
         dbx.files_download_zip_to_file(self.zip_path, dropbox_path)
 
     def unzip(self):

@@ -1,14 +1,16 @@
 import argparse
+import logging
 import os
 import shlex
 import subprocess
+import unicodedata
 from pathlib import Path
 from typing import Iterable
 
 import luigi
 from wt_airtable_client import AirtableConnectionInfo, AirtableHttpClient, AirtableRecord, AirtableTableInfo, CellFormat
 
-from tasks.write_metadata import WriteMetadata
+from tasks.rename import Rename
 
 OH_TABLE = "Oral Histories"
 OH_ID_COLUMN = "Identifier"
@@ -36,8 +38,18 @@ def get_eligible_oral_history_records(airtable_client: AirtableHttpClient) -> It
 
 
 def get_compliant_oh_id(oh_id: str) -> str:
-    # TODO
-    return oh_id
+    normalized = unicodedata.normalize("NFKD", oh_id)
+    has_unicode_error = False
+    try:
+        ascii = normalized.encode("ascii").decode("ascii")
+    except UnicodeError:
+        ascii = normalized.encode("ascii", "ignore").decode("ascii")
+        has_unicode_error = True
+
+    ascii = ascii.replace("+", "-")
+    if has_unicode_error:
+        logging.warning(f"'{oh_id}' will be renamed to '{ascii}'")
+    return ascii
 
 
 def run():
@@ -54,9 +66,10 @@ def run():
 
     luigi.build(
         [
-            WriteMetadata(
+            Rename(
                 oh_id=oh.fields["Identifier"],  # The id on Airtable (may contain diacritics)
                 metadata=oh.fields,
+                compliant_oh_id=get_compliant_oh_id(oh.fields["Identifier"]),
                 dev=args.dev,
             )
             for oh in get_eligible_oral_history_records(airtable_client)

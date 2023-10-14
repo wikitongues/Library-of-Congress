@@ -1,61 +1,34 @@
 import os
 import shutil
 import subprocess
-from functools import cached_property
 from pathlib import Path
 
-import luigi
-
 from .archival_target import ArchivalTarget
-from .archival_task import ArchivalTask, ArchivalTaskError
-from .constants import VALID_VIDEO_EXTENSIONS
+from .archival_task import ArchivalTask
+from .constants import LOCTEMP_PREFIX, VALID_VIDEO_EXTENSIONS
 from .download import Download
+from .exceptions import ArchivalTaskError, NoThumbnail, NoVideo
+from .utils import thumbnail_exists, video_exists
 
 
 class PrepareTarget(ArchivalTarget):
     def __init__(self, pre_release_dir, dropbox_identifier):
-        path = f"{pre_release_dir}/loctemp__{dropbox_identifier}/"
+        path = f"{pre_release_dir}/{LOCTEMP_PREFIX}{dropbox_identifier}/"
         super().__init__(path)
         self.dropbox_identifier = dropbox_identifier
 
-    def thumbnail_exists(self) -> bool:
-        return self.fs.exists(Path(self.path) / f"{self.dropbox_identifier}.jpg")
-
-    def video_exists(self) -> bool:
-        return any(
-            (self.fs.exists(Path(self.path) / f"{self.dropbox_identifier}.{ext}") for ext in VALID_VIDEO_EXTENSIONS)
-        )
-
     def exists(self):
-        return self.thumbnail_exists() and self.video_exists()
-
-
-class NoThumbnail(ArchivalTaskError):
-    pass
-
-
-class NoVideo(ArchivalTaskError):
-    pass
+        return thumbnail_exists(Path(self.path), self.dropbox_identifier, self.fs) and video_exists(
+            Path(self.path), self.dropbox_identifier, self.fs
+        )
 
 
 class Prepare(ArchivalTask):
-    oh_id = luigi.Parameter()
-
     def requires(self):
-        return Download(
-            oh_id=self.oh_id,
-        )
-
-    def input(self) -> luigi.LocalTarget:
-        # Override so type hinting works
-        return super().input()
+        return Download(**self.param_kwargs)
 
     def output(self) -> PrepareTarget:
         return PrepareTarget(self.pre_release_dir, self.dropbox_identifier)
-
-    @cached_property
-    def dropbox_identifier(self) -> str:
-        return Path(self.input().path).name
 
     def prepare_pre_release_directory(self):
         status = subprocess.call(["./scripts/loc-prepare.sh", *(["-d"] if self.dev else []), self.dropbox_identifier])
@@ -99,18 +72,20 @@ class Prepare(ArchivalTask):
 
         raise NoThumbnail
 
-    # def rename_to_compliant_identifier(self):
-    #     video_extension = ""  # TODO
-    #     loctemp_path = Path(self.pre_release_dir) / f"loctemp__{self.dropbox_identifier}"
-    #     compliant_loctemp_path = Path(self.pre_release_dir) / f"loctemp__{self.compliant_oh_id}"
-    #     (loctemp_path / f"{self.dropbox_identifier}.{video_extension}").rename(f"{self.compliant_oh_id}.{video_extension}")
-
     def run(self):
         self.prepare_pre_release_directory()
         self.remove_extraneous_text_files()
 
-        if not self.output().video_exists():
+        if not video_exists(
+            Path(f"{self.pre_release_dir}/{LOCTEMP_PREFIX}{self.dropbox_identifier}/"),
+            self.dropbox_identifier,
+            self.output().fs,
+        ):
             self.use_raw_video()
 
-        if not self.output().thumbnail_exists():
+        if not thumbnail_exists(
+            Path(f"{self.pre_release_dir}/{LOCTEMP_PREFIX}{self.dropbox_identifier}/"),
+            self.dropbox_identifier,
+            self.output().fs,
+        ):
             self.use_raw_thumbnail()
