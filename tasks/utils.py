@@ -1,3 +1,5 @@
+import contextlib
+import os
 from pathlib import Path
 
 import luigi
@@ -23,3 +25,14 @@ def thumbnail_exists(path: Path, basename: str, fs: luigi.target.FileSystem) -> 
 
 def video_exists(path: Path, basename: str, fs: luigi.target.FileSystem) -> bool:
     return any((fs.exists(path / f"{basename}.{ext}") for ext in VALID_VIDEO_EXTENSIONS))
+
+
+# https://stackoverflow.com/a/75049063
+@contextlib.contextmanager
+def cd_temp(dir):
+    orig_dir = os.getcwd()
+    os.chdir(dir)
+    try:
+        yield
+    finally:
+        os.chdir(orig_dir)

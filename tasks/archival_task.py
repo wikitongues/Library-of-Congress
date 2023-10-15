@@ -1,8 +1,11 @@
 import logging
 import os
 from functools import cached_property
+from pathlib import Path
 
 import luigi
+
+from .constants import LOCTEMP_PREFIX
 
 
 class ArchivalTask(luigi.Task):
@@ -25,9 +28,6 @@ class ArchivalTask(luigi.Task):
 
         self.logger = logging.getLogger("luigi-interface")
 
-        # Override task_id string to make logs more concise
-        # TODO self.task_id =
-
     def input(self) -> luigi.LocalTarget:
         # Override so type hinting works
         return super().input()
@@ -37,3 +37,11 @@ class ArchivalTask(luigi.Task):
         # TODO
         # Attempt to locate the correct folder on Dropbox - may be a legacy identifier format
         return self.oh_id
+
+    @property
+    def loctemp_path(self) -> Path:
+        return Path(self.pre_release_dir) / (LOCTEMP_PREFIX + self.dropbox_identifier)
+
+    @property
+    def compliant_loctemp_path(self) -> Path:
+        return Path(self.pre_release_dir) / (LOCTEMP_PREFIX + self.compliant_oh_id)

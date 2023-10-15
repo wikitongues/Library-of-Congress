@@ -100,8 +100,7 @@ class WriteMetadata(ArchivalTask):
 
     @property
     def metadata_path(self):
-        loctemp_path = Path(self.pre_release_dir) / self.loctemp_folder_name
-        return f"{loctemp_path}/{self.dropbox_identifier}{METADATA_SUFFIX}"
+        return f"{self.loctemp_path}/{self.dropbox_identifier}{METADATA_SUFFIX}"
 
     def run(self):
         content = (

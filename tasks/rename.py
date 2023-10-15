@@ -32,16 +32,13 @@ class Rename(ArchivalTask):
         return RenameTarget(self.pre_release_dir, self.compliant_oh_id)
 
     def run(self):
-        loctemp_path = Path(self.pre_release_dir) / (LOCTEMP_PREFIX + self.dropbox_identifier)
+        video_extension = get_video_extension(self.loctemp_path, self.dropbox_identifier, self.input().fs)
 
-        video_extension = get_video_extension(loctemp_path, self.dropbox_identifier, self.input().fs)
-
-        compliant_loctemp_path = Path(self.pre_release_dir) / f"{LOCTEMP_PREFIX}{self.compliant_oh_id}"
-        (loctemp_path / f"{self.dropbox_identifier}.{video_extension}").rename(
-            loctemp_path / f"{self.compliant_oh_id}.{video_extension}"
+        (self.loctemp_path / f"{self.dropbox_identifier}.{video_extension}").rename(
+            self.loctemp_path / f"{self.compliant_oh_id}.{video_extension}"
         )
-        (loctemp_path / f"{self.dropbox_identifier}.jpg").rename(loctemp_path / f"{self.compliant_oh_id}.jpg")
-        (loctemp_path / f"{self.dropbox_identifier}{METADATA_SUFFIX}").rename(
-            loctemp_path / f"{self.compliant_oh_id}{METADATA_SUFFIX}"
+        (self.loctemp_path / f"{self.dropbox_identifier}.jpg").rename(self.loctemp_path / f"{self.compliant_oh_id}.jpg")
+        (self.loctemp_path / f"{self.dropbox_identifier}{METADATA_SUFFIX}").rename(
+            self.loctemp_path / f"{self.compliant_oh_id}{METADATA_SUFFIX}"
         )
-        loctemp_path.rename(compliant_loctemp_path)
+        self.loctemp_path.rename(self.compliant_loctemp_path)
