@@ -6,7 +6,7 @@ import luigi
 from tqdm import tqdm
 
 from .archival_task import ArchivalTask
-from .release import Release
+from .stage import Stage
 
 CHUNK_SIZE = 4 * 1024 * 1024
 TIMEOUT = 900
@@ -21,7 +21,7 @@ class Upload(ArchivalTask):
     compliant_oh_id = luigi.Parameter()
 
     def requires(self):
-        return Release(
+        return Stage(
             oh_id=self.oh_id,
             compliant_oh_id=self.compliant_oh_id,
         )
