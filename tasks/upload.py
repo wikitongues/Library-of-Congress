@@ -1,15 +1,57 @@
 import os
 from functools import cached_property
+from pathlib import Path
 
 import dropbox
-import luigi
+import luigi.contrib.dropbox
 from tqdm import tqdm
 
 from .archival_task import ArchivalTask
+from .constants import METADATA_SUFFIX, THUMBNAIL_EDITED_SUFFIX, VIDEO_EDITED_SUFFIX
 from .stage import Stage
+from .utils import metadata_exists, thumbnail_exists, video_exists
 
 CHUNK_SIZE = 4 * 1024 * 1024
 TIMEOUT = 900
+
+
+class UploadTarget(luigi.contrib.dropbox.DropboxTarget):
+    def __init__(self, staging_dir, compliant_oh_id, token):
+        path = f"{staging_dir}/{compliant_oh_id}"
+        super().__init__(path, token)
+        self.compliant_oh_id = compliant_oh_id
+
+    def exists(self):
+        if not self.fs.exists(self.path):
+            return False
+
+        data_path = Path(self.path) / "data"
+
+        if not (
+            all(
+                (
+                    self.fs.exists(self.path + "/" + name)
+                    for name in [
+                        "bag-info.txt",
+                        "bagit.txt",
+                        "data",
+                        "manifest-sha256.txt",
+                        "manifest-sha512.txt",
+                        "tagmanifest-sha256.txt",
+                        "tagmanifest-sha512.txt",
+                    ]
+                )
+            )
+            and len(self.fs.listdir(self.path)) == 7
+            and thumbnail_exists(data_path, self.compliant_oh_id + THUMBNAIL_EDITED_SUFFIX, self.fs)
+            and video_exists(data_path, self.compliant_oh_id + VIDEO_EDITED_SUFFIX, self.fs)
+            and metadata_exists(data_path, self.compliant_oh_id + METADATA_SUFFIX, self.fs)
+            and len(self.fs.listdir(str(data_path))) == 3
+        ):
+            return False
+
+        # TODO download to tmp folder and validate with bagit
+        return True
 
 
 # https://stackoverflow.com/a/33828537
@@ -17,18 +59,11 @@ TIMEOUT = 900
 
 
 class Upload(ArchivalTask):
-    oh_id = luigi.Parameter()
-    compliant_oh_id = luigi.Parameter()
-
     def requires(self):
-        return Stage(
-            oh_id=self.oh_id,
-            compliant_oh_id=self.compliant_oh_id,
-        )
+        return Stage(**self.param_kwargs)
 
     def output(self):
-        # TODO switch to luigi.contrib.dropbox.DropboxTarget
-        return luigi.LocalTarget(f"{self.dropbox_staging_dir}/{self.compliant_oh_id}/")
+        return UploadTarget(self.dropbox_staging_dir, self.compliant_oh_id, self.dropbox_token)
 
     @cached_property
     def dbx(self):
