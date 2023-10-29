@@ -1,5 +1,3 @@
-import os
-import shutil
 from zipfile import ZipFile
 
 import dropbox
@@ -34,8 +32,9 @@ class Download(ArchivalTask):
             z.extractall(self.local_oh_dir)
 
     def cleanup(self):
-        os.remove(self.zip_path)
-        shutil.rmtree(f"{self.local_oh_dir}/__MACOSX", ignore_errors=True)
+        fs = self.output().fs
+        fs.remove(self.zip_path)
+        fs.remove(f"{self.local_oh_dir}/__MACOSX")
 
     def run(self):
         self.validate()

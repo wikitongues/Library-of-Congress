@@ -1,5 +1,3 @@
-import os
-import shutil
 import subprocess
 from pathlib import Path
 
@@ -37,10 +35,11 @@ class Prepare(ArchivalTask):
 
     def remove_extraneous_text_files(self):
         path = Path(self.output().path)
-        for filename in os.listdir(path):
-            if filename.split(".")[-1] == "txt":
+        fs = self.output().fs
+        for filename in fs.listdir(str(path)):
+            if filename.endswith(".txt"):
                 self.logger.info(f"Removing {path / filename}")
-                os.remove(path / filename)
+                fs.remove(str(path / filename))
 
     def use_raw_video(self):
         path = Path(self.output().path)
@@ -48,13 +47,13 @@ class Prepare(ArchivalTask):
         raw_videos = list(
             filter(
                 lambda filename: filename.split(".")[-1].lower() in VALID_VIDEO_EXTENSIONS,
-                os.listdir(raw_clips_path),
+                self.output().fs.listdir(str(raw_clips_path)),
             )
         )
         if len(raw_videos) == 1:
             self.logger.info(f"Found raw video: {raw_videos[0]}")
             ext = raw_videos[0].split(".")[-1].lower()
-            shutil.copyfile(raw_clips_path / raw_videos[0], path / f"{self.dropbox_identifier}.{ext}")
+            self.output().fs.copy(str(raw_clips_path / raw_videos[0]), str(path / f"{self.dropbox_identifier}.{ext}"))
             return
 
         raise NoVideo
@@ -63,11 +62,16 @@ class Prepare(ArchivalTask):
         path = Path(self.output().path)
         raw_thumbnail_path = path / "raws" / "thumbnail"
         raw_thumbnails = list(
-            filter(lambda filename: filename.split(".")[-1].lower() == "jpg", os.listdir(raw_thumbnail_path))
+            filter(
+                lambda filename: filename.split(".")[-1].lower() == "jpg",
+                self.output().fs.listdir(str(raw_thumbnail_path)),
+            )
         )
         if len(raw_thumbnails) == 1:
             self.logger.info(f"Found raw thumbnail: {raw_thumbnails[0]}")
-            shutil.copyfile(raw_thumbnail_path / raw_thumbnails[0], path / f"{self.dropbox_identifier}.jpg")
+            self.output().fs.copy(
+                str(raw_thumbnail_path / raw_thumbnails[0]), str(path / f"{self.dropbox_identifier}.jpg")
+            )
             return
 
         raise NoThumbnail

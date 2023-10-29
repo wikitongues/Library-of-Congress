@@ -1,5 +1,3 @@
-import os
-import shutil
 import subprocess
 from pathlib import Path
 
@@ -25,7 +23,7 @@ class FlattenTarget(ArchivalTarget):
             thumbnail_exists(Path(self.path), self.compliant_oh_id + THUMBNAIL_EDITED_SUFFIX, self.fs)
             and video_exists(Path(self.path), self.compliant_oh_id + VIDEO_EDITED_SUFFIX, self.fs)
             and metadata_exists(Path(self.path), self.compliant_oh_id + METADATA_SUFFIX, self.fs)
-            and len(os.listdir(self.path)) == 3
+            and len(list(self.fs.listdir(self.path))) == 3
         )
 
 
@@ -51,12 +49,13 @@ class Flatten(ArchivalTask):
                 raise ArchivalTaskError("loc-flatten failed!")
 
     def remove_ds_store_files(self):
-        for dir, dirs, files in os.walk(self.compliant_loctemp_path):
-            if ".DS_STORE" in files:
-                os.remove(Path(dir) / ".DS_STORE")
+        fs = self.output().fs
+        for file in fs.listdir(str(self.compliant_loctemp_path)):
+            if file.endswith(".DS_STORE"):
+                fs.remove(file)
 
     def remove_temp_dir(self):
-        shutil.rmtree(self.compliant_loctemp_path / "temp")
+        self.output().fs.remove(str(self.compliant_loctemp_path / "temp"))
 
     def run(self):
         self.flatten_pre_release_directory()

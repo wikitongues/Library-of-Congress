@@ -1,4 +1,3 @@
-import os
 import shutil
 from pathlib import Path
 
@@ -27,7 +26,7 @@ class StagingTarget(ArchivalTarget):
             thumbnail_exists(data_path, self.compliant_oh_id + THUMBNAIL_EDITED_SUFFIX, self.fs)
             and video_exists(data_path, self.compliant_oh_id + VIDEO_EDITED_SUFFIX, self.fs)
             and metadata_exists(data_path, self.compliant_oh_id + METADATA_SUFFIX, self.fs)
-            and len(os.listdir(data_path)) == 3
+            and len(list(self.fs.listdir(str(data_path)))) == 3
             and bagit.Bag(self.path).is_valid()
         )
 
