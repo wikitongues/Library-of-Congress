@@ -42,11 +42,11 @@ class UploadTarget(luigi.contrib.dropbox.DropboxTarget):
                     ]
                 )
             )
-            and len(self.fs.listdir(self.path)) == 7
             and thumbnail_exists(data_path, self.compliant_oh_id + THUMBNAIL_EDITED_SUFFIX, self.fs)
             and video_exists(data_path, self.compliant_oh_id + VIDEO_EDITED_SUFFIX, self.fs)
             and metadata_exists(data_path, self.compliant_oh_id + METADATA_SUFFIX, self.fs)
-            and len(self.fs.listdir(str(data_path))) == 3
+            # Dropbox listdir includes input path
+            and len(self.fs.listdir(self.path)) == 11
         ):
             return False
 

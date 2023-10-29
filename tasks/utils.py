@@ -16,15 +16,15 @@ def get_video_extension(path: Path, basename: str, fs: luigi.target.FileSystem) 
 
 
 def metadata_exists(path: Path, name: str, fs: luigi.target.FileSystem) -> bool:
-    return fs.exists(path / name)
+    return fs.exists(str(path / name))
 
 
 def thumbnail_exists(path: Path, basename: str, fs: luigi.target.FileSystem) -> bool:
-    return fs.exists(path / f"{basename}.jpg")
+    return fs.exists(str(path / f"{basename}.jpg"))
 
 
 def video_exists(path: Path, basename: str, fs: luigi.target.FileSystem) -> bool:
-    return any((fs.exists(path / f"{basename}.{ext}") for ext in VALID_VIDEO_EXTENSIONS))
+    return any((fs.exists(str(path / f"{basename}.{ext}")) for ext in VALID_VIDEO_EXTENSIONS))
 
 
 # https://stackoverflow.com/a/75049063
