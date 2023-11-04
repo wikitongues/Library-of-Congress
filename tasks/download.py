@@ -1,31 +1,57 @@
+from functools import cached_property
 from zipfile import ZipFile
 
 import dropbox
 import luigi
 
 from .archival_task import ArchivalTask
+from .constants import VALID_VIDEO_EXTENSIONS
+from .exceptions import NoDropboxFolder, NoThumbnail, NoVideo
 
 
 class Download(ArchivalTask):
     @property
+    def dropbox_path(self) -> str:
+        return f"{self.dropbox_oh_dir}/{self.dropbox_identifier}"
+
+    @property
     def zip_path(self) -> str:
         return f"{self.local_oh_dir}/{self.dropbox_identifier}.zip"
+
+    @cached_property
+    def dbx(self) -> dropbox.Dropbox:
+        return dropbox.Dropbox(self.dropbox_token).with_path_root(
+            dropbox.common.PathRoot.root(self.dropbox_root_namespace_id)
+        )
 
     def output(self):
         return luigi.LocalTarget(f"{self.local_oh_dir}/{self.dropbox_identifier}/")
 
-    def validate(self):
-        # TODO
-        # validate file structure via Dropbox API (replicate logic of loc-validate.sh)
-        # set archival status flag on Airtable and raise exception if invalid
-        pass
+    def validate(self) -> bool:
+        try:
+            files = []
+            lister = self.dbx.files_list_folder(self.dropbox_path, recursive=True)
+            files.extend(lister.entries)
+            while lister.has_more:
+                lister = self.dbx.files_list_folder_continue(lister.cursor)
+                files.extend(lister.entries)
+            filenames = [f.path_display for f in files]
+        except dropbox.exceptions.ApiError:
+            # TODO differentiate between not found and other error
+            raise NoDropboxFolder
+
+        if not any((f.endswith(".jpg") for f in filenames)):
+            self.logger.warn(f"No thumbnail found on Dropbox for {self.oh_id}; skipping.")
+            raise NoThumbnail
+
+        if not any((any((f.endswith(f".{ext}") for ext in VALID_VIDEO_EXTENSIONS)) for f in filenames)):
+            self.logger.warn(f"No video found on Dropbox for {self.oh_id}; skipping.")
+            raise NoVideo
+
+        return True
 
     def download(self):
-        dbx = dropbox.Dropbox(self.dropbox_token).with_path_root(
-            dropbox.common.PathRoot.root(self.dropbox_root_namespace_id)
-        )
-        dropbox_path = f"{self.dropbox_oh_dir}/{self.dropbox_identifier}"
-        dbx.files_download_zip_to_file(self.zip_path, dropbox_path)
+        self.dbx.files_download_zip_to_file(self.zip_path, self.dropbox_path)
 
     def unzip(self):
         with ZipFile(self.zip_path, "r") as z:
@@ -34,7 +60,10 @@ class Download(ArchivalTask):
     def cleanup(self):
         fs = self.output().fs
         fs.remove(self.zip_path)
-        fs.remove(f"{self.local_oh_dir}/__MACOSX")
+        try:
+            fs.remove(f"{self.local_oh_dir}/__MACOSX")
+        except FileNotFoundError:
+            pass
 
     def run(self):
         self.validate()
