@@ -1,6 +1,5 @@
 import logging
 import os
-from functools import cached_property
 from pathlib import Path
 
 import luigi
@@ -32,15 +31,9 @@ class ArchivalTask(luigi.Task):
         # Override so type hinting works
         return super().input()
 
-    @cached_property
-    def dropbox_identifier(self) -> str:
-        # TODO
-        # Attempt to locate the correct folder on Dropbox - may be a legacy identifier format
-        return self.oh_id
-
     @property
     def loctemp_path(self) -> Path:
-        return Path(self.pre_release_dir) / (LOCTEMP_PREFIX + self.dropbox_identifier)
+        return Path(self.pre_release_dir) / (LOCTEMP_PREFIX + self.oh_id)
 
     @property
     def compliant_loctemp_path(self) -> Path:

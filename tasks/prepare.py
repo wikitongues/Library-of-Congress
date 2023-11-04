@@ -10,14 +10,14 @@ from .utils import thumbnail_exists, video_exists
 
 
 class PrepareTarget(ArchivalTarget):
-    def __init__(self, pre_release_dir, dropbox_identifier):
-        path = f"{pre_release_dir}/{LOCTEMP_PREFIX}{dropbox_identifier}/"
+    def __init__(self, pre_release_dir, oh_id):
+        path = f"{pre_release_dir}/{LOCTEMP_PREFIX}{oh_id}/"
         super().__init__(path)
-        self.dropbox_identifier = dropbox_identifier
+        self.oh_id = oh_id
 
     def exists(self):
-        return thumbnail_exists(Path(self.path), self.dropbox_identifier, self.fs) and video_exists(
-            Path(self.path), self.dropbox_identifier, self.fs
+        return thumbnail_exists(Path(self.path), self.oh_id, self.fs) and video_exists(
+            Path(self.path), self.oh_id, self.fs
         )
 
 
@@ -26,10 +26,10 @@ class Prepare(ArchivalTask):
         return Download(**self.param_kwargs)
 
     def output(self) -> PrepareTarget:
-        return PrepareTarget(self.pre_release_dir, self.dropbox_identifier)
+        return PrepareTarget(self.pre_release_dir, self.oh_id)
 
     def prepare_pre_release_directory(self):
-        status = subprocess.call(["./scripts/loc-prepare.sh", *(["-d"] if self.dev else []), self.dropbox_identifier])
+        status = subprocess.call(["./scripts/loc-prepare.sh", *(["-d"] if self.dev else []), self.oh_id])
         if status != 0:
             raise ArchivalTaskError("loc-prepare failed!")
 
@@ -53,7 +53,7 @@ class Prepare(ArchivalTask):
         if len(raw_videos) == 1:
             self.logger.info(f"Found raw video: {raw_videos[0]}")
             ext = raw_videos[0].split(".")[-1].lower()
-            self.output().fs.copy(str(raw_clips_path / raw_videos[0]), str(path / f"{self.dropbox_identifier}.{ext}"))
+            self.output().fs.copy(str(raw_clips_path / raw_videos[0]), str(path / f"{self.oh_id}.{ext}"))
             return
 
         raise NoVideo
@@ -69,9 +69,7 @@ class Prepare(ArchivalTask):
         )
         if len(raw_thumbnails) == 1:
             self.logger.info(f"Found raw thumbnail: {raw_thumbnails[0]}")
-            self.output().fs.copy(
-                str(raw_thumbnail_path / raw_thumbnails[0]), str(path / f"{self.dropbox_identifier}.jpg")
-            )
+            self.output().fs.copy(str(raw_thumbnail_path / raw_thumbnails[0]), str(path / f"{self.oh_id}.jpg"))
             return
 
         raise NoThumbnail
@@ -81,15 +79,15 @@ class Prepare(ArchivalTask):
         self.remove_extraneous_text_files()
 
         if not video_exists(
-            Path(f"{self.pre_release_dir}/{LOCTEMP_PREFIX}{self.dropbox_identifier}/"),
-            self.dropbox_identifier,
+            Path(f"{self.pre_release_dir}/{LOCTEMP_PREFIX}{self.oh_id}/"),
+            self.oh_id,
             self.output().fs,
         ):
             self.use_raw_video()
 
         if not thumbnail_exists(
-            Path(f"{self.pre_release_dir}/{LOCTEMP_PREFIX}{self.dropbox_identifier}/"),
-            self.dropbox_identifier,
+            Path(f"{self.pre_release_dir}/{LOCTEMP_PREFIX}{self.oh_id}/"),
+            self.oh_id,
             self.output().fs,
         ):
             self.use_raw_thumbnail()

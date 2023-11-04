@@ -100,7 +100,7 @@ class WriteMetadata(ArchivalTask):
 
     @property
     def metadata_path(self):
-        return f"{self.loctemp_path}/{self.dropbox_identifier}{METADATA_SUFFIX}"
+        return f"{self.loctemp_path}/{self.oh_id}{METADATA_SUFFIX}"
 
     def run(self):
         content = (

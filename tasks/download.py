@@ -12,11 +12,11 @@ from .exceptions import NoDropboxFolder, NoThumbnail, NoVideo
 class Download(ArchivalTask):
     @property
     def dropbox_path(self) -> str:
-        return f"{self.dropbox_oh_dir}/{self.dropbox_identifier}"
+        return f"{self.dropbox_oh_dir}/{self.oh_id}"
 
     @property
     def zip_path(self) -> str:
-        return f"{self.local_oh_dir}/{self.dropbox_identifier}.zip"
+        return f"{self.local_oh_dir}/{self.oh_id}.zip"
 
     @cached_property
     def dbx(self) -> dropbox.Dropbox:
@@ -25,7 +25,7 @@ class Download(ArchivalTask):
         )
 
     def output(self):
-        return luigi.LocalTarget(f"{self.local_oh_dir}/{self.dropbox_identifier}/")
+        return luigi.LocalTarget(f"{self.local_oh_dir}/{self.oh_id}/")
 
     def validate(self) -> bool:
         try:
