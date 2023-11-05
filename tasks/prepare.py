@@ -1,11 +1,11 @@
-import subprocess
+import shutil
 from pathlib import Path
 
 from .archival_target import ArchivalTarget
 from .archival_task import ArchivalTask
 from .constants import LOCTEMP_PREFIX, VALID_VIDEO_EXTENSIONS
 from .download import Download
-from .exceptions import ArchivalTaskError, NoThumbnail, NoVideo
+from .exceptions import NoThumbnail, NoVideo
 from .utils import thumbnail_exists, video_exists
 
 
@@ -29,9 +29,9 @@ class Prepare(ArchivalTask):
         return PrepareTarget(self.pre_release_dir, self.oh_id)
 
     def prepare_pre_release_directory(self):
-        status = subprocess.call(["./scripts/loc-prepare.sh", *(["-d"] if self.dev else []), self.oh_id])
-        if status != 0:
-            raise ArchivalTaskError("loc-prepare failed!")
+        shutil.copytree(
+            Path(self.local_oh_dir) / self.oh_id, Path(self.pre_release_dir) / (LOCTEMP_PREFIX + self.oh_id)
+        )
 
     def remove_extraneous_text_files(self):
         path = Path(self.output().path)

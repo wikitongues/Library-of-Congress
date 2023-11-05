@@ -54,7 +54,6 @@ class UploadTarget(luigi.contrib.dropbox.DropboxTarget):
             return False
 
         with tempfile.TemporaryDirectory() as temp_dir:
-            print(temp_dir)
             zip_path = f"{temp_dir}/{self.compliant_oh_id}.zip"
             self.fs.conn.files_download_zip_to_file(zip_path, self.path)
             with ZipFile(zip_path, "r") as z:
