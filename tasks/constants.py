@@ -8,3 +8,5 @@ VALID_VIDEO_EXTENSIONS = ["mp4", "mov", "mpg", "mpeg", "avi", "m4v", "wmv", "mts
 OH_TABLE = "Oral Histories"
 OH_ID_COLUMN = "Identifier"
 ELIGIBILITY_FIELD = "LOC Eligibility"
+STATUS_FIELD = "LOC Status"
+STATUS_DEV_FIELD = "LOC Status (dev)"

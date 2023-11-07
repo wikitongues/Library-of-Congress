@@ -1,10 +1,12 @@
 import contextlib
 import os
+from functools import cache
 from pathlib import Path
 
 import luigi
+from wt_airtable_client import AirtableConnectionInfo, AirtableHttpClient, AirtableTableInfo
 
-from .constants import VALID_VIDEO_EXTENSIONS
+from .constants import OH_ID_COLUMN, OH_TABLE, VALID_VIDEO_EXTENSIONS
 from .exceptions import NoVideo
 
 
@@ -36,3 +38,11 @@ def cd_temp(dir):
         yield
     finally:
         os.chdir(orig_dir)
+
+
+@cache
+def get_airtable_client() -> AirtableHttpClient:
+    return AirtableHttpClient(
+        AirtableConnectionInfo(os.environ["LOC_BASE"], os.environ["LOC_APIKEY"]),
+        AirtableTableInfo(OH_TABLE, OH_ID_COLUMN),
+    )

@@ -8,11 +8,12 @@ from pathlib import Path
 from typing import Iterable
 
 import luigi
-from wt_airtable_client import AirtableConnectionInfo, AirtableHttpClient, AirtableRecord, AirtableTableInfo, CellFormat
+from wt_airtable_client import AirtableHttpClient, AirtableRecord, CellFormat
 
-from tasks.constants import ELIGIBILITY_FIELD, OH_ID_COLUMN, OH_TABLE
+from tasks.check_archival_status import CheckArchivalStatus
+from tasks.constants import ELIGIBILITY_FIELD
 from tasks.enums import Eligibility
-from tasks.upload import Upload
+from tasks.utils import get_airtable_client
 
 
 def init_env(dev: bool) -> None:
@@ -60,15 +61,13 @@ def run():
 
     init_env(args.dev)
 
-    airtable_client = AirtableHttpClient(
-        AirtableConnectionInfo(os.environ["LOC_BASE"], os.environ["LOC_APIKEY"]),
-        AirtableTableInfo(OH_TABLE, OH_ID_COLUMN),
-    )
+    airtable_client = get_airtable_client()
 
     luigi.build(
         (
-            Upload(
-                oh_id=oh.fields["Identifier"],  # The id on Airtable (may contain diacritics)
+            CheckArchivalStatus(
+                airtable_record_id=oh.id,  # Airtable-assigned identifier
+                oh_id=oh.fields["Identifier"],  # Wikitongues-assigned identifier
                 metadata=oh.fields,
                 compliant_oh_id=get_compliant_oh_id(oh.fields["Identifier"]),
                 dev=args.dev,
