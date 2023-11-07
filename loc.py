@@ -10,10 +10,9 @@ from typing import Iterable
 import luigi
 from wt_airtable_client import AirtableConnectionInfo, AirtableHttpClient, AirtableRecord, AirtableTableInfo, CellFormat
 
-from tasks.rename import Rename
-
-OH_TABLE = "Oral Histories"
-OH_ID_COLUMN = "Identifier"
+from tasks.constants import ELIGIBILITY_FIELD, OH_ID_COLUMN, OH_TABLE
+from tasks.enums import Eligibility
+from tasks.upload import Upload
 
 
 def init_env(dev: bool) -> None:
@@ -29,11 +28,13 @@ def init_env(dev: bool) -> None:
 
 
 def get_eligible_oral_history_records(airtable_client: AirtableHttpClient) -> Iterable[AirtableRecord]:
-    return airtable_client.get_records_by_fields(
-        {},  # TODO
+    yield from airtable_client.get_records_by_fields(
+        {ELIGIBILITY_FIELD: Eligibility.ELIGIBLE.value},
         cell_format=CellFormat.STRING,
         time_zone="America/New_York",
         user_locale="en-ca",
+        max_records=os.environ.get("MAX_RECORDS"),
+        page_size=os.environ.get("PAGE_SIZE"),
     )
 
 
@@ -65,15 +66,15 @@ def run():
     )
 
     luigi.build(
-        [
-            Rename(
+        (
+            Upload(
                 oh_id=oh.fields["Identifier"],  # The id on Airtable (may contain diacritics)
                 metadata=oh.fields,
                 compliant_oh_id=get_compliant_oh_id(oh.fields["Identifier"]),
                 dev=args.dev,
             )
             for oh in get_eligible_oral_history_records(airtable_client)
-        ],
+        ),
         local_scheduler=True,
     )
 
