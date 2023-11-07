@@ -29,9 +29,9 @@ class Prepare(ArchivalTask):
         return PrepareTarget(self.pre_release_dir, self.oh_id)
 
     def prepare_pre_release_directory(self):
-        shutil.copytree(
-            Path(self.local_oh_dir) / self.oh_id, Path(self.pre_release_dir) / (LOCTEMP_PREFIX + self.oh_id)
-        )
+        if self.output().fs.exists(str(self.loctemp_path)):
+            shutil.rmtree(self.loctemp_path)
+        shutil.copytree(Path(self.local_oh_dir) / self.oh_id, self.loctemp_path)
 
     def remove_extraneous_text_files(self):
         path = Path(self.output().path)
