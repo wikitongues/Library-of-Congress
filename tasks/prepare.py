@@ -1,3 +1,4 @@
+import re
 import shutil
 from pathlib import Path
 
@@ -43,6 +44,27 @@ class Prepare(ArchivalTask):
 
     def use_raw_video(self):
         path = Path(self.output().path)
+
+        # Is there any video file in the root, perhaps with a legacy filename?
+        root_videos = list(
+            filter(
+                lambda filename: re.match(
+                    rf"^{re.escape(str(path))}\/[^\/]+\.(?:{'|'.join(f'(?:{ext})' for ext in VALID_VIDEO_EXTENSIONS)})$",
+                    filename,
+                    re.IGNORECASE,
+                ),
+                self.output().fs.listdir(str(path)),
+            )
+        )
+        if len(root_videos) == 1:
+            self.logger.warning(f"Using video: {root_videos[0]}")
+            ext = root_videos[0].split(".")[-1].lower()
+            self.output().fs.rename(root_videos[0], str(path / f"{self.oh_id}.{ext}"))
+            return
+        if len(root_videos) > 1:
+            # Alert archivist to clean up folder
+            raise NoVideo
+
         raw_clips_path = path / "raws" / "footage" / "clips"
         raw_videos = list(
             filter(
@@ -60,6 +82,22 @@ class Prepare(ArchivalTask):
 
     def use_raw_thumbnail(self):
         path = Path(self.output().path)
+
+        # Is there any jpg file in the root, perhaps with a legacy filename?
+        root_jpgs = list(
+            filter(
+                lambda filename: re.match(rf"^{re.escape(str(path))}\/[\w_]+\.jpg$", filename, re.IGNORECASE),
+                self.output().fs.listdir(str(path)),
+            )
+        )
+        if len(root_jpgs) == 1:
+            self.logger.warning(f"Using image as thumbnail: {root_jpgs[0]}")
+            self.output().fs.rename(root_jpgs[0], str(path / f"{self.oh_id}.jpg"))
+            return
+        if len(root_jpgs) > 1:
+            # Alert archivist to clean up folder
+            raise NoThumbnail
+
         raw_thumbnail_path = path / "raws" / "thumbnail"
         raw_thumbnails = list(
             filter(
