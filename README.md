@@ -95,12 +95,22 @@ source env/bin/activate
 
 Run:
 ```
-python loc.py
+functions-framework --target run_http_function
+```
+
+Send request:
+```
+curl -X POST localhost:8080 -H "Content-Type: application/cloudevents+json" -d '{"id": "<identifier>"}'
+```
+
+Run (LEGACY):
+```
+python main.py
 ```
 
 Run in dev mode (using settings from `~/loc-config-dev`):
 ```
-python loc.py -d
+python main.py -d
 ```
 
 ## Develop

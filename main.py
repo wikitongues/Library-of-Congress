@@ -1,13 +1,18 @@
 import argparse
+import json
 import logging
 import os
 import shlex
 import subprocess
 import unicodedata
+from http import HTTPStatus
 from pathlib import Path
 from typing import Iterable
 
+import flask
+import functions_framework
 import luigi
+from flask import abort
 from wt_airtable_client import AirtableHttpClient, AirtableRecord, CellFormat
 
 from tasks.check_archival_status import CheckArchivalStatus
@@ -54,7 +59,19 @@ def get_compliant_oh_id(oh_id: str) -> str:
     return ascii
 
 
-def run():
+@functions_framework.http
+def run_http_function(request: flask.Request):
+    if request.method != "POST":
+        abort(HTTPStatus.METHOD_NOT_ALLOWED)
+
+    payload = json.loads(request.data)
+    # TODO Validate request: correct fields, ISO code consistent with identifier, etc
+    id = payload["id"]
+
+    return f"One order of {id}, coming right up!"
+
+
+def run_cli():
     parser = argparse.ArgumentParser(description="Prepare oral histories for ingestion by archival partners")
     parser.add_argument("-d", "--dev", action="store_true")
     args = parser.parse_args()
@@ -79,4 +96,4 @@ def run():
 
 
 if __name__ == "__main__":
-    run()
+    run_cli()
