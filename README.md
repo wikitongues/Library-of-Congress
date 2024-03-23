@@ -95,12 +95,12 @@ source env/bin/activate
 
 Run:
 ```
-functions-framework --target run_http_function
+functions-framework --target=run_event
 ```
 
 Send request:
 ```
-curl -X POST localhost:8080 -H "Content-Type: application/cloudevents+json" -d '{"id": "<identifier>"}'
+./scripts/loc-request.sh <identifier>
 ```
 
 Run (LEGACY):

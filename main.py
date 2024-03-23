@@ -1,18 +1,17 @@
 import argparse
+import base64
 import json
 import logging
 import os
 import shlex
 import subprocess
 import unicodedata
-from http import HTTPStatus
 from pathlib import Path
 from typing import Iterable
 
-import flask
 import functions_framework
 import luigi
-from flask import abort
+from cloudevents.abstract.event import CloudEvent
 from wt_airtable_client import AirtableHttpClient, AirtableRecord, CellFormat
 
 from tasks.check_archival_status import CheckArchivalStatus
@@ -59,16 +58,13 @@ def get_compliant_oh_id(oh_id: str) -> str:
     return ascii
 
 
-@functions_framework.http
-def run_http_function(request: flask.Request):
-    if request.method != "POST":
-        abort(HTTPStatus.METHOD_NOT_ALLOWED)
-
-    payload = json.loads(request.data)
-    # TODO Validate request: correct fields, ISO code consistent with identifier, etc
-    id = payload["id"]
-
-    return f"One order of {id}, coming right up!"
+@functions_framework.cloud_event
+def run_event(cloud_event: CloudEvent):
+    payload = cloud_event.get_data()
+    # https://cloud.google.com/eventarc/docs/samples/eventarc-pubsub-handler#eventarc_pubsub_handler-python
+    data = json.loads(base64.b64decode(payload["message"]["data"]).decode("utf-8").strip())
+    id = data["id"]
+    print(f"Look, I found a {id}")
 
 
 def run_cli():
