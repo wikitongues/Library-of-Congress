@@ -51,8 +51,10 @@ def run_event(cloud_event: CloudEvent):
     data = json.loads(base64.b64decode(payload["message"]["data"]).decode("utf-8").strip())
     id = data["id"]
     dev = data.get("dev", False)
+    local = data.get("local", False)
 
-    init_env(dev)
+    if local:
+        init_env(dev)
 
     airtable = get_airtable_client()
     record = airtable.get(id, cell_format="string", time_zone="America/New_York", user_locale="en-ca")
