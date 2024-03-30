@@ -4,7 +4,7 @@ from functools import cached_property
 from pathlib import Path
 
 import luigi
-from wt_airtable_client import AirtableHttpClient
+from pyairtable import Table
 
 from .constants import LOCTEMP_PREFIX, STATUS_DEV_FIELD, STATUS_FIELD
 from .utils import get_airtable_client
@@ -46,5 +46,5 @@ class ArchivalTask(luigi.Task):
         return STATUS_DEV_FIELD if self.dev else STATUS_FIELD
 
     @cached_property
-    def airtable_client(self) -> AirtableHttpClient:
+    def airtable_client(self) -> Table:
         return get_airtable_client()

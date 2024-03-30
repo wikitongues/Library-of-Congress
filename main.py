@@ -1,4 +1,3 @@
-import argparse
 import base64
 import json
 import logging
@@ -7,12 +6,10 @@ import shlex
 import subprocess
 import unicodedata
 from pathlib import Path
-from typing import Iterable
 
 import functions_framework
 import luigi
 from cloudevents.abstract.event import CloudEvent
-from wt_airtable_client import AirtableHttpClient, AirtableRecord, CellFormat
 
 from tasks.check_archival_status import CheckArchivalStatus
 from tasks.constants import ELIGIBILITY_FIELD
@@ -30,17 +27,6 @@ def init_env(dev: bool) -> None:
         (key, _, value) = line.decode().partition("=")
         os.environ[key.strip()] = value.strip()
     proc.communicate()
-
-
-def get_eligible_oral_history_records(airtable_client: AirtableHttpClient) -> Iterable[AirtableRecord]:
-    yield from airtable_client.get_records_by_fields(
-        {ELIGIBILITY_FIELD: Eligibility.ELIGIBLE.value},
-        cell_format=CellFormat.STRING,
-        time_zone="America/New_York",
-        user_locale="en-ca",
-        max_records=os.environ.get("MAX_RECORDS"),
-        page_size=os.environ.get("PAGE_SIZE"),
-    )
 
 
 def get_compliant_oh_id(oh_id: str) -> str:
@@ -64,32 +50,28 @@ def run_event(cloud_event: CloudEvent):
     # https://cloud.google.com/eventarc/docs/samples/eventarc-pubsub-handler#eventarc_pubsub_handler-python
     data = json.loads(base64.b64decode(payload["message"]["data"]).decode("utf-8").strip())
     id = data["id"]
-    print(f"Look, I found a {id}")
+    dev = data.get("dev", False)
 
+    init_env(dev)
 
-def run_cli():
-    parser = argparse.ArgumentParser(description="Prepare oral histories for ingestion by archival partners")
-    parser.add_argument("-d", "--dev", action="store_true")
-    args = parser.parse_args()
+    airtable = get_airtable_client()
+    record = airtable.get(id, cell_format="string", time_zone="America/New_York", user_locale="en-ca")
+    fields = record["fields"]
+    oh_id = fields["Identifier"]
 
-    init_env(args.dev)
-
-    airtable_client = get_airtable_client()
+    assert (
+        fields[ELIGIBILITY_FIELD] == Eligibility.ELIGIBLE.value
+    ), "The requested oral history is ineligible for archival."
 
     luigi.build(
         (
             CheckArchivalStatus(
-                airtable_record_id=oh.id,  # Airtable-assigned identifier
-                oh_id=oh.fields["Identifier"],  # Wikitongues-assigned identifier
-                metadata=oh.fields,
-                compliant_oh_id=get_compliant_oh_id(oh.fields["Identifier"]),
-                dev=args.dev,
-            )
-            for oh in get_eligible_oral_history_records(airtable_client)
+                airtable_record_id=id,
+                oh_id=oh_id,
+                metadata=fields,
+                compliant_oh_id=get_compliant_oh_id(oh_id),
+                dev=dev,
+            ),
         ),
         local_scheduler=True,
     )
-
-
-if __name__ == "__main__":
-    run_cli()

@@ -11,7 +11,7 @@ read -r -d '' payload << EOL
             "googclient_schemaencoding": "JSON",
             "googclient_schemarevisionid": "1234"
         },
-        "data": "$(echo "{\"id\": \"$id\"}" | base64)",
+        "data": "$(echo "{\"id\": \"$id\", \"dev\": true}" | base64)",
         "messageId": "1234",
         "message_id": "1234",
         "publishTime": "2024-03-24T16:28:35.273Z",

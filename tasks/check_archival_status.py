@@ -22,4 +22,4 @@ class CheckArchivalStatus(ArchivalTask):
         return ArchivalStatusTarget(self.metadata.get(self.status_field))
 
     def run(self):
-        self.airtable_client.update_record(self.airtable_record_id, {self.status_field: ArchivalStatus.ARCHIVED.value})
+        self.airtable_client.update(self.airtable_record_id, {self.status_field: ArchivalStatus.ARCHIVED.value})

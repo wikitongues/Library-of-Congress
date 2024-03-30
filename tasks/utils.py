@@ -4,9 +4,9 @@ from functools import cache
 from pathlib import Path
 
 import luigi
-from wt_airtable_client import AirtableConnectionInfo, AirtableHttpClient, AirtableTableInfo
+from pyairtable import Api, Table
 
-from .constants import OH_ID_COLUMN, OH_TABLE, VALID_VIDEO_EXTENSIONS
+from .constants import OH_TABLE, VALID_VIDEO_EXTENSIONS
 from .exceptions import NoVideo
 
 
@@ -41,8 +41,6 @@ def cd_temp(dir):
 
 
 @cache
-def get_airtable_client() -> AirtableHttpClient:
-    return AirtableHttpClient(
-        AirtableConnectionInfo(os.environ["LOC_BASE"], os.environ["LOC_APIKEY"]),
-        AirtableTableInfo(OH_TABLE, OH_ID_COLUMN),
-    )
+def get_airtable_client() -> Table:
+    airtable_api = Api(os.environ["LOC_APIKEY"])
+    return airtable_api.table(os.environ["LOC_BASE"], OH_TABLE)

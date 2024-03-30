@@ -62,12 +62,6 @@ BAGIT_ORGANIZATION_ADDRESS=''
 BAGIT_SOURCE_ORGANIZATION=''
 ```
 
-For development/testing, you may also create a separate file `~/loc-config-dev` with your dev settings. You may add Airtable pagination settings to test with a small sample of oral histories:
-```bash
-PAGE_SIZE=2
-MAX_RECORDS=2
-```
-
 ### Find Airtable API parameters
 Find Airtable API key and base id here: https://airtable.com/api
 
