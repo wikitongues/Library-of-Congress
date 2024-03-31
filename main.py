@@ -65,6 +65,10 @@ def run_event(cloud_event: CloudEvent):
         fields[ELIGIBILITY_FIELD] == Eligibility.ELIGIBLE.value
     ), "The requested oral history is ineligible for archival."
 
+    os.makedirs(os.environ["OH"], exist_ok=True)
+    os.makedirs(os.environ["LOC_PreRelease"], exist_ok=True)
+    os.makedirs(os.environ["LOC_Staging"], exist_ok=True)
+
     luigi.build(
         (
             CheckArchivalStatus(
