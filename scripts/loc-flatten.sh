@@ -139,60 +139,47 @@ while (( $# )); do
 done
 set -- "${args[@]}"
 
-loc_config=~/loc-config
-if [[ $dev == true ]]; then
-  loc_config=~/loc-config-dev
-fi
-
-source $loc_config
-
 target=${LOC_PreRelease}
 if [[ `pwd` = ${target} ]]; then
-  if [[ -f $loc_config ]]; then
+  # Check all directories first
+  for i in "$@"
+  do
+    # directory must have loctemp__ in name
+    if ! [[ ${i} =~ ^loctemp__.* ]]; then
+      echo "Error: The folder cannot be flattened: ${i}"
+      echo "Please make sure all of the following conditions are met before trying again:"
+      echo "1 [ ] You have prepared the oral history you'd like to flatten for pre-release using the loc-prepare command."
+      echo "2 [ ] The oral history you're trying to flatten is in the LOC_PreRelease directory."
+      exit 1
+    fi
 
-    # Check all directories first
-    for i in "$@"
-    do
-      # directory must have loctemp__ in name
-      if ! [[ ${i} =~ ^loctemp__.* ]]; then
-        echo "Error: The folder cannot be flattened: ${i}"
-        echo "Please make sure all of the following conditions are met before trying again:"
-        echo "1 [ ] You have prepared the oral history you'd like to flatten for pre-release using the loc-prepare command."
-        echo "2 [ ] The oral history you're trying to flatten is in the LOC_PreRelease directory."
-        exit 1
-      fi
+    # Ensure that directory is in LOC_PreRelease
+    if ! [ $(tr '[:upper:]' '[:lower:]' <<< $(dirname $(pwd)/${i})) = $(tr '[:upper:]' '[:lower:]' <<< ${LOC_PreRelease}) ]; then
+      echo "Error: The folder cannot be flattened: ${i}"
+      echo "The given directory was not found in the LOC_PreRelease directory."
+      exit 1
+    fi
+  done
 
-      # Ensure that directory is in LOC_PreRelease
-      if ! [ $(tr '[:upper:]' '[:lower:]' <<< $(dirname $(pwd)/${i})) = $(tr '[:upper:]' '[:lower:]' <<< ${LOC_PreRelease}) ]; then
-        echo "Error: The folder cannot be flattened: ${i}"
-        echo "The given directory was not found in the LOC_PreRelease directory."
-        exit 1
-      fi
-    done
+  for i in "$@"
+  do
+    cd ${i}
+    obj=`pwd | rev | cut -d'/' -f 1 | rev | cut -c 10-`
+    abs=`pwd`
 
-    for i in "$@"
-    do
-      cd ${i}
-      obj=`pwd | rev | cut -d'/' -f 1 | rev | cut -c 10-`
-      abs=`pwd`
-
-      printf "`pwd | rev | cut -d'/' -f 1 | rev` is valid.\nFlattening...\n"
-      remover "1" "Readme" "*eadme*" "f"
-      remover "2" "Premier(e) Project" "*remier*" "d"
-      remover "3" ".DS_Store" ".DS_Store" "f"
-      set_thumbnail "4"
-      set_video "5"
-      raw_flattener "6"
-      cleaner "7"
-      printf "\nDone. Flattened ${i}\n\nContents:\n"
-      echo "Next, run loc-prune to enter an interactive process to identify which files to keep according to the LOC structure."
-      cd ..
-      ls -R1 ${i}
-    done
-
-  else
-    echo "Error: Couldn't find loc-config. Please run loc-setup."
-  fi
+    printf "`pwd | rev | cut -d'/' -f 1 | rev` is valid.\nFlattening...\n"
+    remover "1" "Readme" "*eadme*" "f"
+    remover "2" "Premier(e) Project" "*remier*" "d"
+    remover "3" ".DS_Store" ".DS_Store" "f"
+    set_thumbnail "4"
+    set_video "5"
+    raw_flattener "6"
+    cleaner "7"
+    printf "\nDone. Flattened ${i}\n\nContents:\n"
+    echo "Next, run loc-prune to enter an interactive process to identify which files to keep according to the LOC structure."
+    cd ..
+    ls -R1 ${i}
+  done
 else
   echo "Error: Please make sure you're in your ./LOC_PreRelease directory. Current directory is ./`pwd | rev | cut -d'/' -f 1 | rev`"
 fi
