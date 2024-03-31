@@ -41,4 +41,5 @@ class Rename(ArchivalTask):
         (self.loctemp_path / f"{self.oh_id}{METADATA_SUFFIX}").rename(
             self.loctemp_path / f"{self.compliant_oh_id}{METADATA_SUFFIX}"
         )
-        self.loctemp_path.rename(self.compliant_loctemp_path)
+        if self.loctemp_path != self.compliant_loctemp_path:
+            self.loctemp_path.rename(self.compliant_loctemp_path)
