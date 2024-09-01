@@ -45,8 +45,8 @@ LOC_PreRelease=''
 LOC_Staging=''
 
 # Airtable API key and base id (see below)
-LOC_APIKEY=''
-LOC_BASE=''
+AIRTABLE_API_KEY=''
+AIRTABLE_BASE=''
 
 # Dropbox API params (see below)
 DROPBOX_TOKEN=''

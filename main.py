@@ -1,32 +1,14 @@
-import base64
-import json
+import argparse
 import logging
 import os
-import shlex
-import subprocess
 import unicodedata
-from pathlib import Path
 
-import functions_framework
 import luigi
-from cloudevents.abstract.event import CloudEvent
 
 from tasks.check_archival_status import CheckArchivalStatus
 from tasks.constants import ELIGIBILITY_FIELD
 from tasks.enums import Eligibility
 from tasks.utils import get_airtable_client
-
-
-def init_env(dev: bool) -> None:
-    # https://stackoverflow.com/a/3505826
-    config_file = "loc-config-dev" if dev else "loc-config"
-    config_path = Path.home() / config_file
-    command = shlex.split(f"env -i bash -c 'set -a && source {config_path} && env'")
-    proc = subprocess.Popen(command, stdout=subprocess.PIPE)
-    for line in proc.stdout:
-        (key, _, value) = line.decode().partition("=")
-        os.environ[key.strip()] = value.strip()
-    proc.communicate()
 
 
 def get_compliant_oh_id(oh_id: str) -> str:
@@ -44,18 +26,7 @@ def get_compliant_oh_id(oh_id: str) -> str:
     return ascii
 
 
-@functions_framework.cloud_event
-def run_event(cloud_event: CloudEvent):
-    payload = cloud_event.get_data()
-    # https://cloud.google.com/eventarc/docs/samples/eventarc-pubsub-handler#eventarc_pubsub_handler-python
-    data = json.loads(base64.b64decode(payload["message"]["data"]).decode("utf-8").strip())
-    id = data["id"]
-    dev = data.get("dev", False)
-    local = data.get("local", False)
-
-    if local:
-        init_env(dev)
-
+def run(id: str, dev: bool):
     airtable = get_airtable_client()
     record = airtable.get(id, cell_format="string", time_zone="America/New_York", user_locale="en-ca")
     fields = record["fields"]
@@ -81,3 +52,12 @@ def run_event(cloud_event: CloudEvent):
         ),
         local_scheduler=True,
     )
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("airtable_id", type=str, help='Airtable-assigned ID (should start with "rec")')
+    parser.add_argument("-d", "--dev", action="store_true", help="Run in dev mode")
+    args = parser.parse_args()
+
+    run(args.airtable_id, args.dev)

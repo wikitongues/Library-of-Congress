@@ -42,5 +42,5 @@ def cd_temp(dir):
 
 @cache
 def get_airtable_client() -> Table:
-    airtable_api = Api(os.environ["LOC_APIKEY"])
-    return airtable_api.table(os.environ["LOC_BASE"], OH_TABLE)
+    airtable_api = Api(os.environ["AIRTABLE_API_KEY"])
+    return airtable_api.table(os.environ["AIRTABLE_BASE"], OH_TABLE)
