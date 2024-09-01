@@ -62,6 +62,7 @@ BAGIT_ORGANIZATION_ADDRESS=''
 BAGIT_SOURCE_ORGANIZATION=''
 ```
 
+For development/testing, you may also create a separate file `~/loc-config-dev` with your dev settings.
 ### Find Airtable API parameters
 Find Airtable API key and base id here: https://airtable.com/api
 
@@ -89,22 +90,13 @@ source env/bin/activate
 
 Run:
 ```
-functions-framework --target=run_event
+python main.py <identifer>
 ```
-
-Send request:
-```
-./scripts/loc-request.sh <identifier>
-```
-
-Run (LEGACY):
-```
-python main.py
-```
+where `<identifier>` is the Airtable-assigned record id (should start with "rec").
 
 Run in dev mode (using settings from `~/loc-config-dev`):
 ```
-python main.py -d
+python main.py -d <identifier>
 ```
 
 ## Develop
