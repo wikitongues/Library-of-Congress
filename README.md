@@ -99,6 +99,11 @@ Run in dev mode (using settings from `~/loc-config-dev`):
 python main.py -d <identifier>
 ```
 
+### Run via Github workflow
+```
+gh workflow run 'LOC Archival (dev)' -f airtableId=<identifier>
+```
+
 ## Develop
 To make a dummy oral history folder for testing, `cd` into your test `OH` directory and run `loc-test <identifier>`.
 
