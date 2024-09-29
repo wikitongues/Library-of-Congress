@@ -107,7 +107,7 @@ hoister () {
 cleaner () {
   # remove empty directory
   echo "${1}. Cleaning up empty directories."
-  find "${LOC_PreRelease}/${i}" -type d | tail -r | xargs rmdir 2>/dev/null
+  find "${target}/${i}" -type d | tail -r | xargs rmdir 2>/dev/null
 }
 
 # rename raws/... to ___raws
@@ -139,7 +139,7 @@ while (( $# )); do
 done
 set -- "${args[@]}"
 
-target=${LOC_PreRelease}
+target=$(eval echo -n $LOC_PreRelease)
 if [[ `pwd` = ${target} ]]; then
   # Check all directories first
   for i in "$@"
@@ -154,7 +154,7 @@ if [[ `pwd` = ${target} ]]; then
     fi
 
     # Ensure that directory is in LOC_PreRelease
-    if ! [ $(tr '[:upper:]' '[:lower:]' <<< $(dirname $(pwd)/${i})) = $(tr '[:upper:]' '[:lower:]' <<< ${LOC_PreRelease}) ]; then
+    if ! [ $(tr '[:upper:]' '[:lower:]' <<< $(dirname $(pwd)/${i})) = $(tr '[:upper:]' '[:lower:]' <<< ${target}) ]; then
       echo "Error: The folder cannot be flattened: ${i}"
       echo "The given directory was not found in the LOC_PreRelease directory."
       exit 1
@@ -183,5 +183,5 @@ if [[ `pwd` = ${target} ]]; then
 else
   echo "Error: Please make sure you're in your ./LOC_PreRelease directory."
   echo "Current directory is `pwd`"
-  echo "Expected ${LOC_PreRelease}"
+  echo "Expected ${target}"
 fi
