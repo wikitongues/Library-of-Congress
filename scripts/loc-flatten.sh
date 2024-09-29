@@ -181,5 +181,7 @@ if [[ `pwd` = ${target} ]]; then
     ls -R1 ${i}
   done
 else
-  echo "Error: Please make sure you're in your ./LOC_PreRelease directory. Current directory is ./`pwd | rev | cut -d'/' -f 1 | rev`"
+  echo "Error: Please make sure you're in your ./LOC_PreRelease directory."
+  echo "Current directory is `pwd`"
+  echo "Expected ${LOC_PreRelease}"
 fi
