@@ -6,7 +6,6 @@ on:
       airtableId:
         description: 'Airtable-assigned ID (should start with "rec")'
         required: true
-  pull_request:
 
 jobs:
   loc:
