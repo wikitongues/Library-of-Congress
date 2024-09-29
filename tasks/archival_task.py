@@ -23,9 +23,9 @@ class ArchivalTask(luigi.Task):
         self.dropbox_token = os.environ["DROPBOX_TOKEN"]
         self.dropbox_root_namespace_id = os.environ["DROPBOX_ROOT_NAMESPACE_ID"]
         self.dropbox_oh_dir = os.environ["OH_DROPBOX_REMOTE_DIR"]
-        self.pre_release_dir = os.environ["LOC_PreRelease"]
-        self.local_staging_dir = os.environ["LOC_Staging"]
-        self.dropbox_staging_dir = os.environ["STAGING_DROPBOX"]
+        self.pre_release_dir = os.path.expandvars(os.environ["LOC_PreRelease"])
+        self.local_staging_dir = os.path.expandvars(os.environ["LOC_Staging"])
+        self.dropbox_staging_dir = os.path.expandvars(os.environ["STAGING_DROPBOX"])
 
         self.logger = logging.getLogger("luigi-interface")
 
