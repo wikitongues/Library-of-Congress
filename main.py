@@ -1,9 +1,11 @@
 import argparse
 import logging
 import os
+import sys
 import unicodedata
 
 import luigi
+import luigi.execution_summary
 
 from tasks.check_archival_status import CheckArchivalStatus
 from tasks.constants import ELIGIBILITY_FIELD
@@ -26,7 +28,7 @@ def get_compliant_oh_id(oh_id: str) -> str:
     return ascii
 
 
-def run(id: str, dev: bool):
+def run(id: str, dev: bool) -> bool:
     airtable = get_airtable_client()
     record = airtable.get(id, cell_format="string", time_zone="America/New_York", user_locale="en-ca")
     fields = record["fields"]
@@ -40,7 +42,7 @@ def run(id: str, dev: bool):
     os.makedirs(os.environ["LOC_PreRelease"], exist_ok=True)
     os.makedirs(os.environ["LOC_Staging"], exist_ok=True)
 
-    luigi.build(
+    result = luigi.build(
         (
             CheckArchivalStatus(
                 airtable_record_id=id,
@@ -51,7 +53,9 @@ def run(id: str, dev: bool):
             ),
         ),
         local_scheduler=True,
+        detailed_summary=True,
     )
+    return result.status == luigi.execution_summary.LuigiStatusCode.SUCCESS
 
 
 if __name__ == "__main__":
@@ -60,4 +64,5 @@ if __name__ == "__main__":
     parser.add_argument("-d", "--dev", action="store_true", help="Run in dev mode")
     args = parser.parse_args()
 
-    run(args.airtable_id, args.dev)
+    success = run(args.airtable_id, args.dev)
+    sys.exit(not success)
