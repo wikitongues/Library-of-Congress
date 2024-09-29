@@ -10,6 +10,7 @@ on:
 jobs:
   loc:
     runs-on: ubuntu-latest
+    environment: prod
 
     steps:
     - name: Checkout repository
