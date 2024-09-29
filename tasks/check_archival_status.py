@@ -23,3 +23,4 @@ class CheckArchivalStatus(ArchivalTask):
 
     def run(self):
         self.airtable_client.update(self.airtable_record_id, {self.status_field: ArchivalStatus.ARCHIVED.value})
+        raise Exception
