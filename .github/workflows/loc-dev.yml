@@ -27,20 +27,8 @@ jobs:
 
     - name: Run LOC script
       env:
-        OH: ${{ secrets.OH }}
-        LOC_PreRelease: ${{ secrets.LOC_PreRelease }}
-        LOC_Staging: ${{ secrets.LOC_Staging }}
         DROPBOX_TOKEN: ${{ secrets.DROPBOX_TOKEN }}
         DROPBOX_ROOT_NAMESPACE_ID: ${{ secrets.DROPBOX_ROOT_NAMESPACE_ID }}
-        OH_DROPBOX_REMOTE_DIR: ${{ secrets.OH_DROPBOX_REMOTE_DIR }}
-        STAGING_DROPBOX: ${{ secrets.STAGING_DROPBOX }}
-        BAGIT_CONTACT_EMAIL: ${{ secrets.BAGIT_CONTACT_EMAIL }}
-        BAGIT_CONTACT_NAME: ${{ secrets.BAGIT_CONTACT_NAME }}
-        BAGIT_CONTACT_PHONE: ${{ secrets.BAGIT_CONTACT_PHONE }}
-        BAGIT_EXTERNAL_DESCRIPTION: ${{ secrets.BAGIT_EXTERNAL_DESCRIPTION }}
-        BAGIT_INTERNAL_SENDER_DESCRIPTION: ${{ secrets.BAGIT_INTERNAL_SENDER_DESCRIPTION }}
-        BAGIT_ORGANIZATION_ADDRESS: ${{ secrets.BAGIT_ORGANIZATION_ADDRESS }}
-        BAGIT_SOURCE_ORGANIZATION: ${{ secrets.BAGIT_SOURCE_ORGANIZATION }}
         AIRTABLE_API_KEY: ${{ secrets.AIRTABLE_API_KEY }}
         AIRTABLE_BASE: ${{ secrets.AIRTABLE_BASE }}
       run: |
