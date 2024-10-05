@@ -1,0 +1,47 @@
+name: LOC Archival
+
+on:
+  workflow_dispatch:
+    inputs:
+      airtableId:
+        description: 'Airtable-assigned ID (should start with "rec")'
+        required: true
+
+jobs:
+  loc:
+    runs-on: ubuntu-latest
+    environment: prod
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11.6'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run LOC script
+      env:
+        OH: ${{ vars.OH }}
+        LOC_PreRelease: ${{ vars.LOC_PreRelease }}
+        LOC_Staging: ${{ vars.LOC_Staging }}
+        OH_DROPBOX_REMOTE_DIR: ${{ vars.OH_DROPBOX_REMOTE_DIR }}
+        STAGING_DROPBOX: ${{ vars.STAGING_DROPBOX }}
+        BAGIT_CONTACT_EMAIL: ${{ vars.BAGIT_CONTACT_EMAIL }}
+        BAGIT_CONTACT_NAME: ${{ vars.BAGIT_CONTACT_NAME }}
+        BAGIT_CONTACT_PHONE: ${{ vars.BAGIT_CONTACT_PHONE }}
+        BAGIT_EXTERNAL_DESCRIPTION: ${{ vars.BAGIT_EXTERNAL_DESCRIPTION }}
+        BAGIT_ORGANIZATION_ADDRESS: ${{ vars.BAGIT_ORGANIZATION_ADDRESS }}
+        BAGIT_SOURCE_ORGANIZATION: ${{ vars.BAGIT_SOURCE_ORGANIZATION }}
+        DROPBOX_TOKEN: ${{ secrets.DROPBOX_TOKEN }}
+        DROPBOX_ROOT_NAMESPACE_ID: ${{ secrets.DROPBOX_ROOT_NAMESPACE_ID }}
+        AIRTABLE_API_KEY: ${{ secrets.AIRTABLE_API_KEY }}
+        AIRTABLE_BASE: ${{ secrets.AIRTABLE_BASE }}
+      run: |
+        python main.py ${{ inputs.airtableId }}

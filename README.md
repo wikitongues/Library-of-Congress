@@ -45,8 +45,8 @@ LOC_PreRelease=''
 LOC_Staging=''
 
 # Airtable API key and base id (see below)
-LOC_APIKEY=''
-LOC_BASE=''
+AIRTABLE_API_KEY=''
+AIRTABLE_BASE=''
 
 # Dropbox API params (see below)
 DROPBOX_TOKEN=''
@@ -62,12 +62,7 @@ BAGIT_ORGANIZATION_ADDRESS=''
 BAGIT_SOURCE_ORGANIZATION=''
 ```
 
-For development/testing, you may also create a separate file `~/loc-config-dev` with your dev settings. You may add Airtable pagination settings to test with a small sample of oral histories:
-```bash
-PAGE_SIZE=2
-MAX_RECORDS=2
-```
-
+For development/testing, you may also create a separate file `~/loc-config-dev` with your dev settings.
 ### Find Airtable API parameters
 Find Airtable API key and base id here: https://airtable.com/api
 
@@ -95,12 +90,18 @@ source env/bin/activate
 
 Run:
 ```
-python loc.py
+python main.py <identifer>
 ```
+where `<identifier>` is the Airtable-assigned record id (should start with "rec").
 
 Run in dev mode (using settings from `~/loc-config-dev`):
 ```
-python loc.py -d
+python main.py -d <identifier>
+```
+
+### Run via Github workflow
+```
+gh workflow run 'LOC Archival (dev)' -f airtableId=<identifier>
 ```
 
 ## Develop

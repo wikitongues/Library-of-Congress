@@ -7,8 +7,6 @@ from .archival_task import ArchivalTask
 from .constants import METADATA_SUFFIX
 from .prepare import Prepare
 
-OH_TABLE = "Oral Histories"
-OH_ID_COLUMN = "Identifier"
 METADATA_FIELDS = [
     "Identifier",
     "Title",

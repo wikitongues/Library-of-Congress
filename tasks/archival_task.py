@@ -4,7 +4,7 @@ from functools import cached_property
 from pathlib import Path
 
 import luigi
-from wt_airtable_client import AirtableHttpClient
+from pyairtable import Table
 
 from .constants import LOCTEMP_PREFIX, STATUS_DEV_FIELD, STATUS_FIELD
 from .utils import get_airtable_client
@@ -23,9 +23,9 @@ class ArchivalTask(luigi.Task):
         self.dropbox_token = os.environ["DROPBOX_TOKEN"]
         self.dropbox_root_namespace_id = os.environ["DROPBOX_ROOT_NAMESPACE_ID"]
         self.dropbox_oh_dir = os.environ["OH_DROPBOX_REMOTE_DIR"]
-        self.pre_release_dir = os.environ["LOC_PreRelease"]
-        self.local_staging_dir = os.environ["LOC_Staging"]
-        self.dropbox_staging_dir = os.environ["STAGING_DROPBOX"]
+        self.pre_release_dir = os.path.expandvars(os.environ["LOC_PreRelease"])
+        self.local_staging_dir = os.path.expandvars(os.environ["LOC_Staging"])
+        self.dropbox_staging_dir = os.path.expandvars(os.environ["STAGING_DROPBOX"])
 
         self.logger = logging.getLogger("luigi-interface")
 
@@ -46,5 +46,5 @@ class ArchivalTask(luigi.Task):
         return STATUS_DEV_FIELD if self.dev else STATUS_FIELD
 
     @cached_property
-    def airtable_client(self) -> AirtableHttpClient:
+    def airtable_client(self) -> Table:
         return get_airtable_client()
