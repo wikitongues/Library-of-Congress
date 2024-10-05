@@ -1,11 +1,8 @@
 name: LOC Archival
 
 on:
-  workflow_dispatch:
-    inputs:
-      airtableId:
-        description: 'Airtable-assigned ID (should start with "rec")'
-        required: true
+  repository_dispatch:
+    types: [loc_prod]
 
 jobs:
   loc:
@@ -44,4 +41,4 @@ jobs:
         AIRTABLE_API_KEY: ${{ secrets.AIRTABLE_API_KEY }}
         AIRTABLE_BASE: ${{ secrets.AIRTABLE_BASE }}
       run: |
-        python main.py ${{ inputs.airtableId }}
+        python main.py -d ${{ github.event.client_payload.airtableId }}
