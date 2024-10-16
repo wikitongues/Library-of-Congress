@@ -86,7 +86,7 @@ class Prepare(ArchivalTask):
         # Is there any jpg file in the root, perhaps with a legacy filename?
         root_jpgs = list(
             filter(
-                lambda filename: re.match(rf"^{re.escape(str(path))}\/[\w_]+\.jpg$", filename, re.IGNORECASE),
+                lambda filename: re.match(rf"^{re.escape(str(path))}\/[^\/]+\.jpg$", filename, re.IGNORECASE),
                 self.output().fs.listdir(str(path)),
             )
         )
