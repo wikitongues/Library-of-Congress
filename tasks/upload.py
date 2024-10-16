@@ -19,9 +19,9 @@ TIMEOUT = 900
 
 
 class UploadTarget(luigi.contrib.dropbox.DropboxTarget):
-    def __init__(self, staging_dir, compliant_oh_id, token):
+    def __init__(self, staging_dir, compliant_oh_id, token, root_namespace_id):
         path = f"{staging_dir}/{compliant_oh_id}"
-        super().__init__(path, token)
+        super().__init__(path, token, root_namespace_id=root_namespace_id)
         self.compliant_oh_id = compliant_oh_id
 
     def exists(self):
@@ -71,11 +71,15 @@ class Upload(ArchivalTask):
         return Stage(**self.param_kwargs)
 
     def output(self):
-        return UploadTarget(self.dropbox_staging_dir, self.compliant_oh_id, self.dropbox_token)
+        return UploadTarget(
+            self.dropbox_staging_dir, self.compliant_oh_id, self.dropbox_token, self.dropbox_root_namespace_id
+        )
 
     @cached_property
     def dbx(self):
-        return dropbox.Dropbox(self.dropbox_token, timeout=TIMEOUT)
+        return dropbox.Dropbox(self.dropbox_token, timeout=TIMEOUT).with_path_root(
+            dropbox.common.PathRoot.root(self.dropbox_root_namespace_id)
+        )
 
     def upload_file(self, file_path: str) -> None:
         target_path = file_path.replace(self.local_staging_dir, self.dropbox_staging_dir)
