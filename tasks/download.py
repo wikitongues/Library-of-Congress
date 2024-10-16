@@ -102,21 +102,11 @@ class Download(ArchivalTask):
             raise NoDropboxFolder
 
         if not self.has_valid_video(filenames):
-            self.logger.warn(f"No video found on Dropbox for {self.oh_id}; skipping.")
-
-            self.airtable_client.update(
-                self.airtable_record_id, {self.status_field: ArchivalStatus.INVALID_VIDEO.value}
-            )
-
+            self.logger.warning(f"No video found on Dropbox for {self.oh_id}; skipping.")
             raise NoVideo
 
         if not self.has_valid_thumbnail(filenames):
-            self.logger.warn(f"No thumbnail found on Dropbox for {self.oh_id}; skipping.")
-
-            self.airtable_client.update(
-                self.airtable_record_id, {self.status_field: ArchivalStatus.INVALID_THUMBNAIL.value}
-            )
-
+            self.logger.warning(f"No thumbnail found on Dropbox for {self.oh_id}; skipping.")
             raise NoThumbnail
 
     def download(self):
