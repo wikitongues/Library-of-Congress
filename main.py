@@ -11,7 +11,7 @@ from tasks.archival_task import ArchivalTask
 from tasks.check_archival_status import CheckArchivalStatus
 from tasks.constants import ELIGIBILITY_FIELD
 from tasks.enums import ArchivalStatus, Eligibility
-from tasks.exceptions import NoThumbnail, NoVideo
+from tasks.exceptions import NoDropboxFolder, NoThumbnail, NoVideo
 from tasks.utils import get_airtable_client
 
 
@@ -38,6 +38,10 @@ def report_failure(task: ArchivalTask, exception: Exception):
         )
     elif type(exception) == NoVideo:
         task.airtable_client.update(task.airtable_record_id, {task.status_field: ArchivalStatus.INVALID_VIDEO.value})
+    elif type(exception) == NoDropboxFolder:
+        task.airtable_client.update(
+            task.airtable_record_id, {task.status_field: ArchivalStatus.NO_DROPBOX_FOLDER.value}
+        )
     else:
         task.airtable_client.update(task.airtable_record_id, {task.status_field: ArchivalStatus.PROCESSING_ERROR.value})
 

@@ -8,7 +8,6 @@ import luigi
 
 from .archival_task import ArchivalTask
 from .constants import VALID_VIDEO_EXTENSIONS
-from .enums import ArchivalStatus
 from .exceptions import NoDropboxFolder, NoThumbnail, NoVideo
 
 
