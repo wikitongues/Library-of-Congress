@@ -41,4 +41,4 @@ jobs:
         AIRTABLE_API_KEY: ${{ secrets.AIRTABLE_API_KEY }}
         AIRTABLE_BASE: ${{ secrets.AIRTABLE_BASE }}
       run: |
-        python main.py -d ${{ github.event.client_payload.airtableId }}
+        python main.py ${{ github.event.client_payload.airtableId }}
