@@ -7,9 +7,11 @@ import unicodedata
 import luigi
 import luigi.execution_summary
 
+from tasks.archival_task import ArchivalTask
 from tasks.check_archival_status import CheckArchivalStatus
 from tasks.constants import ELIGIBILITY_FIELD
-from tasks.enums import Eligibility
+from tasks.enums import ArchivalStatus, Eligibility
+from tasks.exceptions import NoDropboxFolder, NoThumbnail, NoVideo
 from tasks.utils import get_airtable_client
 
 
@@ -26,6 +28,22 @@ def get_compliant_oh_id(oh_id: str) -> str:
     if has_unicode_error:
         logging.warning(f"'{oh_id}' will be renamed to '{ascii}'")
     return ascii
+
+
+@ArchivalTask.event_handler(luigi.Event.FAILURE)
+def report_failure(task: ArchivalTask, exception: Exception):
+    if type(exception) == NoThumbnail:
+        task.airtable_client.update(
+            task.airtable_record_id, {task.status_field: ArchivalStatus.INVALID_THUMBNAIL.value}
+        )
+    elif type(exception) == NoVideo:
+        task.airtable_client.update(task.airtable_record_id, {task.status_field: ArchivalStatus.INVALID_VIDEO.value})
+    elif type(exception) == NoDropboxFolder:
+        task.airtable_client.update(
+            task.airtable_record_id, {task.status_field: ArchivalStatus.NO_DROPBOX_FOLDER.value}
+        )
+    else:
+        task.airtable_client.update(task.airtable_record_id, {task.status_field: ArchivalStatus.PROCESSING_ERROR.value})
 
 
 def run(id: str, dev: bool) -> bool:
