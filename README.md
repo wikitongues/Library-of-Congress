@@ -88,7 +88,14 @@ cd scripts
 source env/bin/activate
 ```
 
-Run:
+### Run batch:
+The batch script will run through all oral histories in the LOC Automation view where the archival status is null.
+```
+python batch.py
+```
+
+### Run single:
+Before running, export the variables from the config file.
 ```
 python main.py <identifer>
 ```

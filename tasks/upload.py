@@ -19,10 +19,11 @@ TIMEOUT = 900
 
 
 class UploadTarget(luigi.contrib.dropbox.DropboxTarget):
-    def __init__(self, staging_dir, compliant_oh_id, token, root_namespace_id):
+    def __init__(self, staging_dir, compliant_oh_id, token, root_namespace_id, skip_bagit_uploaded=False):
         path = f"{staging_dir}/{compliant_oh_id}"
         super().__init__(path, token, root_namespace_id=root_namespace_id)
         self.compliant_oh_id = compliant_oh_id
+        self.skip_bagit_uploaded = skip_bagit_uploaded
 
     def exists(self):
         if not self.fs.exists(self.path):
@@ -52,6 +53,9 @@ class UploadTarget(luigi.contrib.dropbox.DropboxTarget):
             and len(self.fs.listdir(self.path)) == 11
         ):
             return False
+
+        if self.skip_bagit_uploaded:
+            return True
 
         with tempfile.TemporaryDirectory() as temp_dir:
             zip_path = f"{temp_dir}/{self.compliant_oh_id}.zip"
