@@ -46,7 +46,7 @@ def report_failure(task: ArchivalTask, exception: Exception):
         task.airtable_client.update(task.airtable_record_id, {task.status_field: ArchivalStatus.PROCESSING_ERROR.value})
 
 
-def run(id: str, dev: bool) -> bool:
+def run(id: str, dev: bool, *, skip_bagit_uploaded: bool = False) -> bool:
     airtable = get_airtable_client()
     record = airtable.get(id, cell_format="string", time_zone="America/New_York", user_locale="en-ca")
     fields = record["fields"]
@@ -68,6 +68,7 @@ def run(id: str, dev: bool) -> bool:
                 metadata=fields,
                 compliant_oh_id=get_compliant_oh_id(oh_id),
                 dev=dev,
+                skip_bagit_uploaded=skip_bagit_uploaded,
             ),
         ),
         local_scheduler=True,

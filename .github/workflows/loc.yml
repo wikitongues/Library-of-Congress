@@ -43,7 +43,7 @@ jobs:
       run: |
         python main.py ${{ github.event.client_payload.airtableId }}
 
-    - name: Post to \#loc-automation-alerts
+    - name: 'Post to #loc-automation-alerts'
       id: slack
       uses: slackapi/slack-github-action@v1.27.0
       with:

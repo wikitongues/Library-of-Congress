@@ -12,6 +12,7 @@ from .utils import get_airtable_client
 
 class ArchivalTask(luigi.Task):
     dev = luigi.BoolParameter(default=True)
+    skip_bagit_uploaded = luigi.BoolParameter(default=False, significant=False)
     metadata = luigi.DictParameter(significant=False)
     oh_id = luigi.Parameter()
     compliant_oh_id = luigi.Parameter()
