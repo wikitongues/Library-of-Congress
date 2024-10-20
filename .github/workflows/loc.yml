@@ -42,3 +42,14 @@ jobs:
         AIRTABLE_BASE: ${{ secrets.AIRTABLE_BASE }}
       run: |
         python main.py ${{ github.event.client_payload.airtableId }}
+
+    - name: Post to \#loc-automation-alerts
+      id: slack
+      uses: slackapi/slack-github-action@v1.27.0
+      with:
+        # Slack channel id, channel name, or user id to post message.
+        # See also: https://api.slack.com/methods/chat.postMessage#channels
+        channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
+        slack-message: "LOC Archival result for ${{ github.event.client_payload.ohId }}: ${{ job.status }}\n${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+      env:
+        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
