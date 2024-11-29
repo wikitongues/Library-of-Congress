@@ -76,7 +76,22 @@ class Download(ArchivalTask):
             # Root folder needs to be cleaned up
             return False
 
-        # A raw jpg file may also be valid assuming the OH is marked as eligible
+        # Is there any png file in the root?
+        root_pngs = list(
+            filter(
+                lambda filename: re.match(
+                    rf"^{re.escape(str(self.dropbox_path))}\/[^\/]+\.png$", filename, re.IGNORECASE
+                ),
+                filenames,
+            )
+        )
+        if len(root_pngs) == 1:
+            return True
+        if len(root_pngs) > 1:
+            # Root folder needs to be cleaned up
+            return False
+
+        # A raw jpg or png file may also be valid assuming the OH is marked as eligible
         raw_jpgs = list(
             filter(
                 lambda filename: re.match(
@@ -85,7 +100,20 @@ class Download(ArchivalTask):
                 filenames,
             )
         )
-        return len(raw_jpgs) == 1
+        if len(raw_jpgs) == 1:
+            return True
+        if len(raw_jpgs) > 1:
+            # Folder needs to be cleaned up - one should be selected and moved to root
+            return False
+        raw_pngs = list(
+            filter(
+                lambda filename: re.match(
+                    rf"^{re.escape(str(self.dropbox_path))}\/raws\/thumbnail\/[^\/]+\.png$", filename, re.IGNORECASE
+                ),
+                filenames,
+            )
+        )
+        return len(raw_pngs) == 1
 
     def validate(self) -> None:
         try:

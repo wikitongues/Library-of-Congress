@@ -2,6 +2,8 @@ import re
 import shutil
 from pathlib import Path
 
+from PIL import Image
+
 from .archival_target import ArchivalTarget
 from .archival_task import ArchivalTask
 from .constants import LOCTEMP_PREFIX, VALID_VIDEO_EXTENSIONS
@@ -98,6 +100,21 @@ class Prepare(ArchivalTask):
             # Alert archivist to clean up folder
             raise NoThumbnail
 
+        # If there is a png, we can convert it
+        root_pngs = list(
+            filter(
+                lambda filename: re.match(rf"^{re.escape(str(path))}\/[^\/]+\.png$", filename, re.IGNORECASE),
+                self.output().fs.listdir(str(path)),
+            )
+        )
+        if len(root_pngs) == 1:
+            self.logger.warning(f"Using image as thumbnail (will convert to jpg): {root_pngs[0]}")
+            self.output().fs.rename(root_pngs[0], str(path / f"{self.oh_id}.png"))
+            return
+        if len(root_pngs) > 1:
+            # Alert archivist to clean up folder
+            raise NoThumbnail
+
         raw_thumbnail_path = path / "raws" / "thumbnail"
         raw_thumbnails = list(
             filter(
@@ -109,8 +126,28 @@ class Prepare(ArchivalTask):
             self.logger.info(f"Found raw thumbnail: {raw_thumbnails[0]}")
             self.output().fs.copy(str(raw_thumbnail_path / raw_thumbnails[0]), str(path / f"{self.oh_id}.jpg"))
             return
+        raw_thumbnails = list(
+            filter(
+                lambda filename: filename.split(".")[-1].lower() == "png",
+                self.output().fs.listdir(str(raw_thumbnail_path)),
+            )
+        )
+        if len(raw_thumbnails) == 1:
+            self.logger.info(f"Found raw thumbnail (will convert to jpg): {raw_thumbnails[0]}")
+            self.output().fs.copy(str(raw_thumbnail_path / raw_thumbnails[0]), str(path / f"{self.oh_id}.png"))
+            return
 
         raise NoThumbnail
+
+    def convert_png_to_jpg(self):
+        path = Path(self.output().path)
+        png_path = path / f"{self.oh_id}.png"
+        img = Image.open(png_path)
+        img_rgb = img.convert("RGB")
+        img_rgb.save(str(path / f"{self.oh_id}.jpg"))
+
+        fs = self.output().fs
+        fs.remove(png_path)
 
     def run(self):
         self.prepare_pre_release_directory()
@@ -129,3 +166,4 @@ class Prepare(ArchivalTask):
             self.output().fs,
         ):
             self.use_raw_thumbnail()
+            self.convert_png_to_jpg()
