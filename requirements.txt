@@ -13,6 +13,7 @@ inflection==0.5.1
 lockfile==0.12.2
 luigi @ git+https://github.com/smrohrer/luigi.git@fe2157aa08f2ce91e914c20b805338aa222fb93c
 nodeenv==1.9.1
+pillow==11.0.0
 platformdirs==4.2.2
 ply==3.11
 pre-commit==3.8.0
