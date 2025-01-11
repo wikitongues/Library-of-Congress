@@ -142,7 +142,7 @@ class Prepare(ArchivalTask):
     def maybe_convert_png_to_jpg(self):
         path = Path(self.output().path)
         png_path = path / f"{self.oh_id}.png"
-        if not png_path.exists:
+        if not png_path.exists():
             return
         img = Image.open(png_path)
         img_rgb = img.convert("RGB")
