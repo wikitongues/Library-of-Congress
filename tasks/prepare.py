@@ -139,9 +139,11 @@ class Prepare(ArchivalTask):
 
         raise NoThumbnail
 
-    def convert_png_to_jpg(self):
+    def maybe_convert_png_to_jpg(self):
         path = Path(self.output().path)
         png_path = path / f"{self.oh_id}.png"
+        if not png_path.exists:
+            return
         img = Image.open(png_path)
         img_rgb = img.convert("RGB")
         img_rgb.save(str(path / f"{self.oh_id}.jpg"))
@@ -166,4 +168,4 @@ class Prepare(ArchivalTask):
             self.output().fs,
         ):
             self.use_raw_thumbnail()
-            self.convert_png_to_jpg()
+            self.maybe_convert_png_to_jpg()
