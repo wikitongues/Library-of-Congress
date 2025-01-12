@@ -52,5 +52,9 @@ jobs:
         # See also: https://api.slack.com/methods/chat.postMessage#channels
         channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
         slack-message: "LOC Archival result for ${{ github.event.client_payload.ohId }}: ${{ job.status }}\n${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        payload: |
+          {
+            "unfurl_links": false
+          }
       env:
         SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
