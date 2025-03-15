@@ -65,7 +65,7 @@ class Download(ArchivalTask):
         root_jpgs = list(
             filter(
                 lambda filename: re.match(
-                    rf"^{re.escape(str(self.dropbox_path))}\/[^\/]+\.jpg$", filename, re.IGNORECASE
+                    rf"^{re.escape(str(self.dropbox_path))}\/[^\/]+\.jpe?g$", filename, re.IGNORECASE
                 ),
                 filenames,
             )
@@ -95,7 +95,7 @@ class Download(ArchivalTask):
         raw_jpgs = list(
             filter(
                 lambda filename: re.match(
-                    rf"^{re.escape(str(self.dropbox_path))}\/raws\/thumbnail\/[^\/]+\.jpg$", filename, re.IGNORECASE
+                    rf"^{re.escape(str(self.dropbox_path))}\/raws\/thumbnail\/[^\/]+\.jpe?g$", filename, re.IGNORECASE
                 ),
                 filenames,
             )
